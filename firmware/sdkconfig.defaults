@@ -1,0 +1,29 @@
+# ── Chip ────────────────────────────────────────────────────────────────────
+CONFIG_IDF_TARGET="esp32p4"
+CONFIG_ESP32P4_REV_MIN_1_3=y
+
+# ── PSRAM ───────────────────────────────────────────────────────────────────
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_SPEED_200M=y
+
+# ── TinyUSB (USB 2.0 PHY — NOT USJ) ─────────────────────────────────────────
+CONFIG_TINYUSB_CDC_ENABLED=y
+CONFIG_TINYUSB_CDC_RX_BUFSIZE=512
+CONFIG_TINYUSB_CDC_TX_BUFSIZE=512
+CONFIG_TINYUSB_DESC_MANUFACTURER_STRING="ESP32-P4C6 Demo"
+CONFIG_TINYUSB_DESC_PRODUCT_STRING="ESP32-P4C6 Demo Board"
+CONFIG_TINYUSB_DESC_SERIAL_STRING="P4C6-001"
+
+# ── Logging ─────────────────────────────────────────────────────────────────
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y
+
+# ── FreeRTOS ─────────────────────────────────────────────────────────────────
+CONFIG_FREERTOS_HZ=1000
+
+# ── SDMMC (eMMC) ─────────────────────────────────────────────────────────────
+CONFIG_SDMMC_USE_GPIO_MATRIX=y
+
+# ── Wi-Fi (via ESP-Hosted / ESP32-C6 SDIO) ──────────────────────────────────
+# Uncomment and configure when ESP-Hosted is wired to the C6 coprocessor.
+# CONFIG_ESP_HOSTED_ENABLED=y

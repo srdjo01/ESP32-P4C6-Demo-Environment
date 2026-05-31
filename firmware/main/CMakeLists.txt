@@ -1,0 +1,17 @@
+idf_component_register(
+    SRCS
+        "app_main.c"
+        "protocol.c"
+    INCLUDE_DIRS
+        "."
+    PRIV_REQUIRES
+        gpio_module
+        uart_module
+        i2c_module
+        emmc_module
+        wifi_module
+        display_module
+        tinyusb
+        json
+        esp_timer
+)
