@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
 #include "driver/sdmmc_host.h"

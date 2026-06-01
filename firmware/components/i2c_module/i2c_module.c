@@ -2,6 +2,8 @@
 
 #include "driver/i2c_master.h"
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include <string.h>
 
 static const char *TAG = "i2c_module";
@@ -149,13 +151,34 @@ int i2c_module_init(void)
         ESP_LOGI(TAG, "QMI8658A detected (WHO_AM_I = 0x%02X)", who);
     }
 
+    /* Soft-reset the QMI8658A so it starts from a known state. */
+    uint8_t reset_cmd = 0xB0;
+    reg_write(s_accel, 0x0A, &reset_cmd, 1);   /* CTRL9 = soft reset */
+    vTaskDelay(pdMS_TO_TICKS(50));              /* wait for reboot    */
+
+    /* Re-verify WHO_AM_I after reset. */
+    reg_read(s_accel, QMI_REG_WHO_AM_I, &who, 1);
+    ESP_LOGI(TAG, "Post-reset WHO_AM_I = 0x%02X", who);
+
     /* Configure accelerometer: 125 Hz ODR, ±2 g full-scale. */
     uint8_t ctrl2 = QMI_CTRL2_VAL;
-    reg_write(s_accel, QMI_REG_CTRL2, &ctrl2, 1);
+    if (reg_write(s_accel, QMI_REG_CTRL2, &ctrl2, 1) != ESP_OK) {
+        ESP_LOGW(TAG, "CTRL2 write failed");
+    }
 
-    /* Enable accelerometer output. */
-    uint8_t ctrl7 = QMI_CTRL7_ACCEL_EN;
-    reg_write(s_accel, QMI_REG_CTRL7, &ctrl7, 1);
+    /* Enable accelerometer (bit0) + gyro (bit1) — some variants need both. */
+    uint8_t ctrl7 = 0x03;
+    if (reg_write(s_accel, QMI_REG_CTRL7, &ctrl7, 1) != ESP_OK) {
+        ESP_LOGW(TAG, "CTRL7 write failed");
+    }
+
+    /* Read back CTRL7 and a few data registers for diagnostics. */
+    uint8_t ctrl7_rb = 0;
+    reg_read(s_accel, QMI_REG_CTRL7, &ctrl7_rb, 1);
+    ESP_LOGI(TAG, "QMI8658A CTRL7 readback = 0x%02X (expected 0x03)", ctrl7_rb);
+
+    /* Wait 3 ODR cycles (25 ms) for first sample to be ready. */
+    vTaskDelay(pdMS_TO_TICKS(25));
 
     /* Verify PCF85063ATL responds. */
     uint8_t ctrl = 0;
@@ -180,6 +203,8 @@ int i2c_module_read_accel(float *x, float *y, float *z)
         ESP_LOGW(TAG, "QMI8658A read failed");
         return -1;
     }
+    ESP_LOGD(TAG, "raw[6]: %02X %02X %02X %02X %02X %02X",
+             raw[0], raw[1], raw[2], raw[3], raw[4], raw[5]);
 
     /* QMI8658A output is little-endian, two's complement 16-bit. */
     int16_t rx = (int16_t)((raw[1] << 8) | raw[0]);

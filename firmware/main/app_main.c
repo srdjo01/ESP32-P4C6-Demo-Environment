@@ -13,7 +13,7 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 #include "tinyusb.h"
-#include "tinyusb_cdcacm.h"
+#include "tusb_cdc_acm.h"
 
 #include "protocol.h"
 #include "gpio_module.h"
@@ -64,13 +64,21 @@ static void cdc_rx_callback(int itf, cdcacm_event_t *event)
 
 /* ── Module initialisation ─────────────────────────────────────────────── */
 
-static void init_modules(void)
+/* Fast modules safe to init before USB comes up. */
+static void init_modules_fast(void)
 {
     ESP_LOGI(TAG, "Initialising GPIO module...");
     gpio_module_init();
 
     ESP_LOGI(TAG, "Initialising UART module...");
     uart_module_init();
+}
+
+/* Slow/hardware-dependent modules — called after USB is up so the board
+ * is reachable even if one of these hangs or fails. */
+static void init_modules_hw(void *arg)
+{
+    (void)arg;
 
     ESP_LOGI(TAG, "Initialising I2C module...");
     if (i2c_module_init() != 0) {
@@ -87,27 +95,29 @@ static void init_modules(void)
         ESP_LOGW(TAG, "Wi-Fi module init failed — ESP-Hosted may not be configured");
     }
 
-    ESP_LOGI(TAG, "Initialising Display module...");
-    if (display_module_init() != 0) {
-        ESP_LOGW(TAG, "Display module init failed — check DSI hardware");
-    }
+    /* Display: skipped — MIPI DSI blocks if panel is not connected. */
+    ESP_LOGW(TAG, "Display module init skipped (connect display hardware first)");
+
+    proto_send("{\"event\":\"hw_ready\",\"i2c\":1,\"emmc\":1}");
+    vTaskDelete(NULL);
 }
 
 /* ── USB / TinyUSB setup ───────────────────────────────────────────────── */
 
 static void init_usb(void)
 {
-    const tinyusb_config_t tusb_cfg = TINYUSB_DEFAULT_CONFIG();
+    const tinyusb_config_t tusb_cfg = {};
     ESP_ERROR_CHECK(tinyusb_driver_install(&tusb_cfg));
 
     tinyusb_config_cdcacm_t acm_cfg = {
+        .usb_dev               = TINYUSB_USBDEV_0,
         .cdc_port              = TINYUSB_CDC_ACM_0,
         .callback_rx           = cdc_rx_callback,
         .callback_rx_wanted_char = NULL,
         .callback_line_state_changed = NULL,
         .callback_line_coding_changed = NULL,
     };
-    ESP_ERROR_CHECK(tinyusb_cdcacm_init(&acm_cfg));
+    ESP_ERROR_CHECK(tusb_cdc_acm_init(&acm_cfg));
 
     ESP_LOGI(TAG, "USB CDC initialised — waiting for host connection");
 }
@@ -118,7 +128,7 @@ void app_main(void)
 {
     ESP_LOGI(TAG, "ESP32-P4C6 Demo Firmware v1.0.0 starting...");
 
-    init_modules();
+    init_modules_fast();
     init_usb();
 
     /* Brief delay so the host can enumerate the CDC device. */
@@ -130,7 +140,9 @@ void app_main(void)
 
     ESP_LOGI(TAG, "Ready. Listening for JSON commands on USB CDC.");
 
-    /* All work is driven by the CDC RX callback — nothing more to do here. */
+    /* Init slow/hardware modules in a background task so USB stays responsive. */
+    xTaskCreate(init_modules_hw, "hw_init", 8192, NULL, 5, NULL);
+
     while (1) {
         vTaskDelay(pdMS_TO_TICKS(1000));
     }

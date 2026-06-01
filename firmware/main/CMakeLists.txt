@@ -11,7 +11,7 @@ idf_component_register(
         emmc_module
         wifi_module
         display_module
-        tinyusb
+        esp_tinyusb
         json
         esp_timer
 )

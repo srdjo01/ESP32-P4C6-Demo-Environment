@@ -84,7 +84,7 @@ static void create_text_screen(void)
     lv_label_set_long_mode(s_label_text, LV_LABEL_LONG_WRAP);
     lv_obj_set_width(s_label_text, DISP_WIDTH - 20);
     lv_obj_set_style_text_color(s_label_text, lv_color_white(), LV_PART_MAIN);
-    lv_obj_set_style_text_font(s_label_text, &lv_font_montserrat_24, LV_PART_MAIN);
+    lv_obj_set_style_text_font(s_label_text, &lv_font_montserrat_14, LV_PART_MAIN);
     lv_obj_align(s_label_text, LV_ALIGN_CENTER, 0, 0);
     lv_label_set_text(s_label_text, "");
 }
@@ -138,15 +138,21 @@ int display_module_init(void)
     }
 
     /* ── CO5300 panel ── */
+    esp_lcd_dpi_panel_config_t dpi_cfg = CO5300_466_466_PANEL_60HZ_DPI_CONFIG(LCD_COLOR_PIXEL_FORMAT_RGB565);
+    co5300_vendor_config_t vendor_cfg = {
+        .mipi_config = {
+            .dsi_bus    = dsi_bus,
+            .dpi_config = &dpi_cfg,
+        },
+        .flags.use_mipi_interface = 1,
+    };
     esp_lcd_panel_dev_config_t panel_dev_cfg = {
-        .bits_per_pixel = 16,  /* RGB565 */
+        .bits_per_pixel = 16,
         .reset_gpio_num = -1,
         .rgb_ele_order  = LCD_RGB_ELEMENT_ORDER_RGB,
+        .vendor_config  = &vendor_cfg,
     };
-    esp_lcd_co5300_config_t co5300_cfg = {
-        .num_fbs = 1,
-    };
-    ret = esp_lcd_new_panel_co5300(io, &panel_dev_cfg, &co5300_cfg, &s_panel);
+    ret = esp_lcd_new_panel_co5300(io, &panel_dev_cfg, &s_panel);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "CO5300 panel init failed: %s", esp_err_to_name(ret));
         esp_ldo_release_channel(s_ldo);

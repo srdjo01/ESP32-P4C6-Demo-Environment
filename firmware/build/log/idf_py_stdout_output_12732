@@ -1,0 +1,291 @@
+[1/19] Linking C static library esp-idf\esp_hid\libesp_hid.a
+[2/19] Linking C static library esp-idf\esp_local_ctrl\libesp_local_ctrl.a
+[3/19] Linking C static library esp-idf\espcoredump\libespcoredump.a
+[4/19] Linking C static library esp-idf\nvs_sec_provider\libnvs_sec_provider.a
+[5/19] Linking C static library esp-idf\esp_eth\libesp_eth.a
+[6/19] Linking C static library esp-idf\rt\librt.a
+[7/19] Linking C static library esp-idf\mqtt\libmqtt.a
+[8/19] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/app_main.c.obj
+FAILED: esp-idf/main/CMakeFiles/__idf_main.dir/app_main.c.obj 
+C:\Espressif\tools\riscv32-esp-elf\esp-14.2.0_20241119\riscv32-esp-elf\bin\riscv32-esp-elf-gcc.exe -DESP_PLATFORM -DIDF_VER=\"v5.4.1\" -DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE -DSOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ -D_GLIBCXX_HAVE_POSIX_SEMAPHORE -D_GLIBCXX_USE_POSIX_SEMAPHORE -D_GNU_SOURCE -D_POSIX_READER_WRITER_LOCKS -I"C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/config" -I"C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main" -IC:/Espressif/v5.4.1/esp-idf/components/newlib/platform_include -IC:/Espressif/v5.4.1/esp-idf/components/freertos/config/include -IC:/Espressif/v5.4.1/esp-idf/components/freertos/config/include/freertos -IC:/Espressif/v5.4.1/esp-idf/components/freertos/config/riscv/include -IC:/Espressif/v5.4.1/esp-idf/components/freertos/FreeRTOS-Kernel/include -IC:/Espressif/v5.4.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/riscv/include -IC:/Espressif/v5.4.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/riscv/include/freertos -IC:/Espressif/v5.4.1/esp-idf/components/freertos/esp_additions/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_hw_support/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_hw_support/include/soc -IC:/Espressif/v5.4.1/esp-idf/components/esp_hw_support/include/soc/esp32p4 -IC:/Espressif/v5.4.1/esp-idf/components/esp_hw_support/dma/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_hw_support/ldo/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_hw_support/debug_probe/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_hw_support/port/esp32p4/. -IC:/Espressif/v5.4.1/esp-idf/components/esp_hw_support/port/esp32p4/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_hw_support/port/esp32p4/private_include -IC:/Espressif/v5.4.1/esp-idf/components/heap/include -IC:/Espressif/v5.4.1/esp-idf/components/heap/tlsf -IC:/Espressif/v5.4.1/esp-idf/components/log/include -IC:/Espressif/v5.4.1/esp-idf/components/soc/include -IC:/Espressif/v5.4.1/esp-idf/components/soc/esp32p4 -IC:/Espressif/v5.4.1/esp-idf/components/soc/esp32p4/include -IC:/Espressif/v5.4.1/esp-idf/components/soc/esp32p4/register -IC:/Espressif/v5.4.1/esp-idf/components/hal/platform_port/include -IC:/Espressif/v5.4.1/esp-idf/components/hal/esp32p4/include -IC:/Espressif/v5.4.1/esp-idf/components/hal/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_rom/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_rom/esp32p4/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_rom/esp32p4/include/esp32p4 -IC:/Espressif/v5.4.1/esp-idf/components/esp_rom/esp32p4 -IC:/Espressif/v5.4.1/esp-idf/components/esp_common/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_system/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_system/port/soc -IC:/Espressif/v5.4.1/esp-idf/components/esp_system/port/include/riscv -IC:/Espressif/v5.4.1/esp-idf/components/esp_system/port/include/private -IC:/Espressif/v5.4.1/esp-idf/components/riscv/include -IC:/Espressif/v5.4.1/esp-idf/components/lwip/include -IC:/Espressif/v5.4.1/esp-idf/components/lwip/include/apps -IC:/Espressif/v5.4.1/esp-idf/components/lwip/include/apps/sntp -IC:/Espressif/v5.4.1/esp-idf/components/lwip/lwip/src/include -IC:/Espressif/v5.4.1/esp-idf/components/lwip/port/include -IC:/Espressif/v5.4.1/esp-idf/components/lwip/port/freertos/include -IC:/Espressif/v5.4.1/esp-idf/components/lwip/port/esp32xx/include -IC:/Espressif/v5.4.1/esp-idf/components/lwip/port/esp32xx/include/arch -IC:/Espressif/v5.4.1/esp-idf/components/lwip/port/esp32xx/include/sys -I"C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/components/gpio_module/include" -I"C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/components/uart_module/include" -I"C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/components/i2c_module/include" -I"C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/components/emmc_module/include" -I"C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/components/wifi_module/include" -I"C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/components/display_module/include" -I"C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/managed_components/espressif__esp_tinyusb/include" -IC:/Espressif/v5.4.1/esp-idf/components/fatfs/diskio -IC:/Espressif/v5.4.1/esp-idf/components/fatfs/src -IC:/Espressif/v5.4.1/esp-idf/components/fatfs/vfs -IC:/Espressif/v5.4.1/esp-idf/components/wear_levelling/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_partition/include -IC:/Espressif/v5.4.1/esp-idf/components/sdmmc/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_driver_sdmmc/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_driver_gpio/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_driver_sdspi/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_driver_spi/include -IC:/Espressif/v5.4.1/esp-idf/components/esp_pm/include -IC:/Espressif/v5.4.1/esp-idf/components/vfs/include -I"C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/managed_components/espressif__tinyusb/src" -IC:/Espressif/v5.4.1/esp-idf/components/json/cJSON -IC:/Espressif/v5.4.1/esp-idf/components/esp_timer/include -march=rv32imafc_zicsr_zifencei_xesppie -mabi=ilp32f  -fdiagnostics-color=always -fdiagnostics-color=always -ffunction-sections -fdata-sections -Wall -Werror=all -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations -Wextra -Wno-error=extra -Wno-unused-parameter -Wno-sign-compare -Wno-enum-conversion -gdwarf-4 -ggdb -nostartfiles -Og -fno-shrink-wrap "-fmacro-prefix-map=C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware=." -fmacro-prefix-map=C:/Espressif/v5.4.1/esp-idf=/IDF -fstrict-volatile-bitfields -fno-jump-tables -fno-tree-switch-conversion -std=gnu17 -Wno-old-style-declaration -DCFG_TUSB_MCU=OPT_MCU_ESP32P4 -MD -MT esp-idf/main/CMakeFiles/__idf_main.dir/app_main.c.obj -MF esp-idf\main\CMakeFiles\__idf_main.dir\app_main.c.obj.d -o esp-idf/main/CMakeFiles/__idf_main.dir/app_main.c.obj -c "C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/app_main.c"
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/app_main.c: In function 'init_usb':
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/app_main.c:100:39: error: implicit declaration of function 'TINYUSB_DEFAULT_CONFIG' [-Wimplicit-function-declaration]
+  100 |     const tinyusb_config_t tusb_cfg = TINYUSB_DEFAULT_CONFIG();
+      |                                       ^~~~~~~~~~~~~~~~~~~~~~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/app_main.c:100:39: error: invalid initializer
+In file included from C:/Espressif/v5.4.1/esp-idf/components/esp_hw_support/include/esp_intr_alloc.h:12,
+                 from C:/Espressif/v5.4.1/esp-idf/components/esp_hw_support/include/esp_cpu.h:20,
+                 from C:/Espressif/v5.4.1/esp-idf/components/esp_hw_support/include/spinlock.h:11,
+                 from C:/Espressif/v5.4.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/riscv/include/freertos/portmacro.h:65,
+                 from C:/Espressif/v5.4.1/esp-idf/components/freertos/FreeRTOS-Kernel/include/freertos/portable.h:57,
+                 from C:/Espressif/v5.4.1/esp-idf/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:69,
+                 from C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/app_main.c:12:
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/app_main.c:110:21: error: implicit declaration of function 'tinyusb_cdcacm_init'; did you mean 'tinyusb_cdcacm_read'? [-Wimplicit-function-declaration]
+  110 |     ESP_ERROR_CHECK(tinyusb_cdcacm_init(&acm_cfg));
+      |                     ^~~~~~~~~~~~~~~~~~~
+C:/Espressif/v5.4.1/esp-idf/components/esp_common/include/esp_err.h:116:30: note: in definition of macro 'ESP_ERROR_CHECK'
+  116 |         esp_err_t err_rc_ = (x);                                        \
+      |                              ^
+[9/19] Linking C static library esp-idf\spiffs\libspiffs.a
+[10/19] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/protocol.c.obj
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c: In function 'b64_decode':
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:15: warning: initialized field overwritten [-Woverride-init]
+   49 |         ['A']=0,['B']=1,['C']=2,['D']=3,['E']=4,['F']=5,['G']=6,['H']=7,
+      |               ^
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:15: note: (near initialization for 'tbl[65]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:23: warning: initialized field overwritten [-Woverride-init]
+   49 |         ['A']=0,['B']=1,['C']=2,['D']=3,['E']=4,['F']=5,['G']=6,['H']=7,
+      |                       ^
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:23: note: (near initialization for 'tbl[66]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:31: warning: initialized field overwritten [-Woverride-init]
+   49 |         ['A']=0,['B']=1,['C']=2,['D']=3,['E']=4,['F']=5,['G']=6,['H']=7,
+      |                               ^
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:31: note: (near initialization for 'tbl[67]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:39: warning: initialized field overwritten [-Woverride-init]
+   49 |         ['A']=0,['B']=1,['C']=2,['D']=3,['E']=4,['F']=5,['G']=6,['H']=7,
+      |                                       ^
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:39: note: (near initialization for 'tbl[68]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:47: warning: initialized field overwritten [-Woverride-init]
+   49 |         ['A']=0,['B']=1,['C']=2,['D']=3,['E']=4,['F']=5,['G']=6,['H']=7,
+      |                                               ^
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:47: note: (near initialization for 'tbl[69]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:55: warning: initialized field overwritten [-Woverride-init]
+   49 |         ['A']=0,['B']=1,['C']=2,['D']=3,['E']=4,['F']=5,['G']=6,['H']=7,
+      |                                                       ^
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:55: note: (near initialization for 'tbl[70]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:63: warning: initialized field overwritten [-Woverride-init]
+   49 |         ['A']=0,['B']=1,['C']=2,['D']=3,['E']=4,['F']=5,['G']=6,['H']=7,
+      |                                                               ^
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:63: note: (near initialization for 'tbl[71]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:71: warning: initialized field overwritten [-Woverride-init]
+   49 |         ['A']=0,['B']=1,['C']=2,['D']=3,['E']=4,['F']=5,['G']=6,['H']=7,
+      |                                                                       ^
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:49:71: note: (near initialization for 'tbl[72]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:15: warning: initialized field overwritten [-Woverride-init]
+   50 |         ['I']=8,['J']=9,['K']=10,['L']=11,['M']=12,['N']=13,['O']=14,['P']=15,
+      |               ^
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:15: note: (near initialization for 'tbl[73]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:23: warning: initialized field overwritten [-Woverride-init]
+   50 |         ['I']=8,['J']=9,['K']=10,['L']=11,['M']=12,['N']=13,['O']=14,['P']=15,
+      |                       ^
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:23: note: (near initialization for 'tbl[74]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:31: warning: initialized field overwritten [-Woverride-init]
+   50 |         ['I']=8,['J']=9,['K']=10,['L']=11,['M']=12,['N']=13,['O']=14,['P']=15,
+      |                               ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:31: note: (near initialization for 'tbl[75]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:40: warning: initialized field overwritten [-Woverride-init]
+   50 |         ['I']=8,['J']=9,['K']=10,['L']=11,['M']=12,['N']=13,['O']=14,['P']=15,
+      |                                        ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:40: note: (near initialization for 'tbl[76]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:49: warning: initialized field overwritten [-Woverride-init]
+   50 |         ['I']=8,['J']=9,['K']=10,['L']=11,['M']=12,['N']=13,['O']=14,['P']=15,
+      |                                                 ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:49: note: (near initialization for 'tbl[77]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:58: warning: initialized field overwritten [-Woverride-init]
+   50 |         ['I']=8,['J']=9,['K']=10,['L']=11,['M']=12,['N']=13,['O']=14,['P']=15,
+      |                                                          ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:58: note: (near initialization for 'tbl[78]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:67: warning: initialized field overwritten [-Woverride-init]
+   50 |         ['I']=8,['J']=9,['K']=10,['L']=11,['M']=12,['N']=13,['O']=14,['P']=15,
+      |                                                                   ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:67: note: (near initialization for 'tbl[79]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:76: warning: initialized field overwritten [-Woverride-init]
+   50 |         ['I']=8,['J']=9,['K']=10,['L']=11,['M']=12,['N']=13,['O']=14,['P']=15,
+      |                                                                            ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:50:76: note: (near initialization for 'tbl[80]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:15: warning: initialized field overwritten [-Woverride-init]
+   51 |         ['Q']=16,['R']=17,['S']=18,['T']=19,['U']=20,['V']=21,['W']=22,['X']=23,
+      |               ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:15: note: (near initialization for 'tbl[81]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:24: warning: initialized field overwritten [-Woverride-init]
+   51 |         ['Q']=16,['R']=17,['S']=18,['T']=19,['U']=20,['V']=21,['W']=22,['X']=23,
+      |                        ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:24: note: (near initialization for 'tbl[82]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:33: warning: initialized field overwritten [-Woverride-init]
+   51 |         ['Q']=16,['R']=17,['S']=18,['T']=19,['U']=20,['V']=21,['W']=22,['X']=23,
+      |                                 ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:33: note: (near initialization for 'tbl[83]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:42: warning: initialized field overwritten [-Woverride-init]
+   51 |         ['Q']=16,['R']=17,['S']=18,['T']=19,['U']=20,['V']=21,['W']=22,['X']=23,
+      |                                          ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:42: note: (near initialization for 'tbl[84]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:51: warning: initialized field overwritten [-Woverride-init]
+   51 |         ['Q']=16,['R']=17,['S']=18,['T']=19,['U']=20,['V']=21,['W']=22,['X']=23,
+      |                                                   ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:51: note: (near initialization for 'tbl[85]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:60: warning: initialized field overwritten [-Woverride-init]
+   51 |         ['Q']=16,['R']=17,['S']=18,['T']=19,['U']=20,['V']=21,['W']=22,['X']=23,
+      |                                                            ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:60: note: (near initialization for 'tbl[86]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:69: warning: initialized field overwritten [-Woverride-init]
+   51 |         ['Q']=16,['R']=17,['S']=18,['T']=19,['U']=20,['V']=21,['W']=22,['X']=23,
+      |                                                                     ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:69: note: (near initialization for 'tbl[87]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:78: warning: initialized field overwritten [-Woverride-init]
+   51 |         ['Q']=16,['R']=17,['S']=18,['T']=19,['U']=20,['V']=21,['W']=22,['X']=23,
+      |                                                                              ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:51:78: note: (near initialization for 'tbl[88]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:15: warning: initialized field overwritten [-Woverride-init]
+   52 |         ['Y']=24,['Z']=25,['a']=26,['b']=27,['c']=28,['d']=29,['e']=30,['f']=31,
+      |               ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:15: note: (near initialization for 'tbl[89]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:24: warning: initialized field overwritten [-Woverride-init]
+   52 |         ['Y']=24,['Z']=25,['a']=26,['b']=27,['c']=28,['d']=29,['e']=30,['f']=31,
+      |                        ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:24: note: (near initialization for 'tbl[90]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:33: warning: initialized field overwritten [-Woverride-init]
+   52 |         ['Y']=24,['Z']=25,['a']=26,['b']=27,['c']=28,['d']=29,['e']=30,['f']=31,
+      |                                 ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:33: note: (near initialization for 'tbl[97]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:42: warning: initialized field overwritten [-Woverride-init]
+   52 |         ['Y']=24,['Z']=25,['a']=26,['b']=27,['c']=28,['d']=29,['e']=30,['f']=31,
+      |                                          ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:42: note: (near initialization for 'tbl[98]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:51: warning: initialized field overwritten [-Woverride-init]
+   52 |         ['Y']=24,['Z']=25,['a']=26,['b']=27,['c']=28,['d']=29,['e']=30,['f']=31,
+      |                                                   ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:51: note: (near initialization for 'tbl[99]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:60: warning: initialized field overwritten [-Woverride-init]
+   52 |         ['Y']=24,['Z']=25,['a']=26,['b']=27,['c']=28,['d']=29,['e']=30,['f']=31,
+      |                                                            ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:60: note: (near initialization for 'tbl[100]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:69: warning: initialized field overwritten [-Woverride-init]
+   52 |         ['Y']=24,['Z']=25,['a']=26,['b']=27,['c']=28,['d']=29,['e']=30,['f']=31,
+      |                                                                     ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:69: note: (near initialization for 'tbl[101]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:78: warning: initialized field overwritten [-Woverride-init]
+   52 |         ['Y']=24,['Z']=25,['a']=26,['b']=27,['c']=28,['d']=29,['e']=30,['f']=31,
+      |                                                                              ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:52:78: note: (near initialization for 'tbl[102]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:15: warning: initialized field overwritten [-Woverride-init]
+   53 |         ['g']=32,['h']=33,['i']=34,['j']=35,['k']=36,['l']=37,['m']=38,['n']=39,
+      |               ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:15: note: (near initialization for 'tbl[103]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:24: warning: initialized field overwritten [-Woverride-init]
+   53 |         ['g']=32,['h']=33,['i']=34,['j']=35,['k']=36,['l']=37,['m']=38,['n']=39,
+      |                        ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:24: note: (near initialization for 'tbl[104]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:33: warning: initialized field overwritten [-Woverride-init]
+   53 |         ['g']=32,['h']=33,['i']=34,['j']=35,['k']=36,['l']=37,['m']=38,['n']=39,
+      |                                 ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:33: note: (near initialization for 'tbl[105]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:42: warning: initialized field overwritten [-Woverride-init]
+   53 |         ['g']=32,['h']=33,['i']=34,['j']=35,['k']=36,['l']=37,['m']=38,['n']=39,
+      |                                          ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:42: note: (near initialization for 'tbl[106]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:51: warning: initialized field overwritten [-Woverride-init]
+   53 |         ['g']=32,['h']=33,['i']=34,['j']=35,['k']=36,['l']=37,['m']=38,['n']=39,
+      |                                                   ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:51: note: (near initialization for 'tbl[107]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:60: warning: initialized field overwritten [-Woverride-init]
+   53 |         ['g']=32,['h']=33,['i']=34,['j']=35,['k']=36,['l']=37,['m']=38,['n']=39,
+      |                                                            ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:60: note: (near initialization for 'tbl[108]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:69: warning: initialized field overwritten [-Woverride-init]
+   53 |         ['g']=32,['h']=33,['i']=34,['j']=35,['k']=36,['l']=37,['m']=38,['n']=39,
+      |                                                                     ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:69: note: (near initialization for 'tbl[109]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:78: warning: initialized field overwritten [-Woverride-init]
+   53 |         ['g']=32,['h']=33,['i']=34,['j']=35,['k']=36,['l']=37,['m']=38,['n']=39,
+      |                                                                              ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:53:78: note: (near initialization for 'tbl[110]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:15: warning: initialized field overwritten [-Woverride-init]
+   54 |         ['o']=40,['p']=41,['q']=42,['r']=43,['s']=44,['t']=45,['u']=46,['v']=47,
+      |               ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:15: note: (near initialization for 'tbl[111]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:24: warning: initialized field overwritten [-Woverride-init]
+   54 |         ['o']=40,['p']=41,['q']=42,['r']=43,['s']=44,['t']=45,['u']=46,['v']=47,
+      |                        ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:24: note: (near initialization for 'tbl[112]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:33: warning: initialized field overwritten [-Woverride-init]
+   54 |         ['o']=40,['p']=41,['q']=42,['r']=43,['s']=44,['t']=45,['u']=46,['v']=47,
+      |                                 ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:33: note: (near initialization for 'tbl[113]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:42: warning: initialized field overwritten [-Woverride-init]
+   54 |         ['o']=40,['p']=41,['q']=42,['r']=43,['s']=44,['t']=45,['u']=46,['v']=47,
+      |                                          ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:42: note: (near initialization for 'tbl[114]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:51: warning: initialized field overwritten [-Woverride-init]
+   54 |         ['o']=40,['p']=41,['q']=42,['r']=43,['s']=44,['t']=45,['u']=46,['v']=47,
+      |                                                   ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:51: note: (near initialization for 'tbl[115]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:60: warning: initialized field overwritten [-Woverride-init]
+   54 |         ['o']=40,['p']=41,['q']=42,['r']=43,['s']=44,['t']=45,['u']=46,['v']=47,
+      |                                                            ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:60: note: (near initialization for 'tbl[116]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:69: warning: initialized field overwritten [-Woverride-init]
+   54 |         ['o']=40,['p']=41,['q']=42,['r']=43,['s']=44,['t']=45,['u']=46,['v']=47,
+      |                                                                     ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:69: note: (near initialization for 'tbl[117]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:78: warning: initialized field overwritten [-Woverride-init]
+   54 |         ['o']=40,['p']=41,['q']=42,['r']=43,['s']=44,['t']=45,['u']=46,['v']=47,
+      |                                                                              ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:54:78: note: (near initialization for 'tbl[118]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:15: warning: initialized field overwritten [-Woverride-init]
+   55 |         ['w']=48,['x']=49,['y']=50,['z']=51,['0']=52,['1']=53,['2']=54,['3']=55,
+      |               ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:15: note: (near initialization for 'tbl[119]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:24: warning: initialized field overwritten [-Woverride-init]
+   55 |         ['w']=48,['x']=49,['y']=50,['z']=51,['0']=52,['1']=53,['2']=54,['3']=55,
+      |                        ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:24: note: (near initialization for 'tbl[120]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:33: warning: initialized field overwritten [-Woverride-init]
+   55 |         ['w']=48,['x']=49,['y']=50,['z']=51,['0']=52,['1']=53,['2']=54,['3']=55,
+      |                                 ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:33: note: (near initialization for 'tbl[121]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:42: warning: initialized field overwritten [-Woverride-init]
+   55 |         ['w']=48,['x']=49,['y']=50,['z']=51,['0']=52,['1']=53,['2']=54,['3']=55,
+      |                                          ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:42: note: (near initialization for 'tbl[122]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:51: warning: initialized field overwritten [-Woverride-init]
+   55 |         ['w']=48,['x']=49,['y']=50,['z']=51,['0']=52,['1']=53,['2']=54,['3']=55,
+      |                                                   ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:51: note: (near initialization for 'tbl[48]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:60: warning: initialized field overwritten [-Woverride-init]
+   55 |         ['w']=48,['x']=49,['y']=50,['z']=51,['0']=52,['1']=53,['2']=54,['3']=55,
+      |                                                            ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:60: note: (near initialization for 'tbl[49]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:69: warning: initialized field overwritten [-Woverride-init]
+   55 |         ['w']=48,['x']=49,['y']=50,['z']=51,['0']=52,['1']=53,['2']=54,['3']=55,
+      |                                                                     ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:69: note: (near initialization for 'tbl[50]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:78: warning: initialized field overwritten [-Woverride-init]
+   55 |         ['w']=48,['x']=49,['y']=50,['z']=51,['0']=52,['1']=53,['2']=54,['3']=55,
+      |                                                                              ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:55:78: note: (near initialization for 'tbl[51]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:15: warning: initialized field overwritten [-Woverride-init]
+   56 |         ['4']=56,['5']=57,['6']=58,['7']=59,['8']=60,['9']=61,['+']=62,['/']=63
+      |               ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:15: note: (near initialization for 'tbl[52]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:24: warning: initialized field overwritten [-Woverride-init]
+   56 |         ['4']=56,['5']=57,['6']=58,['7']=59,['8']=60,['9']=61,['+']=62,['/']=63
+      |                        ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:24: note: (near initialization for 'tbl[53]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:33: warning: initialized field overwritten [-Woverride-init]
+   56 |         ['4']=56,['5']=57,['6']=58,['7']=59,['8']=60,['9']=61,['+']=62,['/']=63
+      |                                 ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:33: note: (near initialization for 'tbl[54]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:42: warning: initialized field overwritten [-Woverride-init]
+   56 |         ['4']=56,['5']=57,['6']=58,['7']=59,['8']=60,['9']=61,['+']=62,['/']=63
+      |                                          ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:42: note: (near initialization for 'tbl[55]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:51: warning: initialized field overwritten [-Woverride-init]
+   56 |         ['4']=56,['5']=57,['6']=58,['7']=59,['8']=60,['9']=61,['+']=62,['/']=63
+      |                                                   ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:51: note: (near initialization for 'tbl[56]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:60: warning: initialized field overwritten [-Woverride-init]
+   56 |         ['4']=56,['5']=57,['6']=58,['7']=59,['8']=60,['9']=61,['+']=62,['/']=63
+      |                                                            ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:60: note: (near initialization for 'tbl[57]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:69: warning: initialized field overwritten [-Woverride-init]
+   56 |         ['4']=56,['5']=57,['6']=58,['7']=59,['8']=60,['9']=61,['+']=62,['/']=63
+      |                                                                     ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:69: note: (near initialization for 'tbl[43]')
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:78: warning: initialized field overwritten [-Woverride-init]
+   56 |         ['4']=56,['5']=57,['6']=58,['7']=59,['8']=60,['9']=61,['+']=62,['/']=63
+      |                                                                              ^~
+C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/main/protocol.c:56:78: note: (near initialization for 'tbl[47]')
+[11/19] Performing build step for 'bootloader'
+[1/1] C:\WINDOWS\system32\cmd.exe /C "cd /D "C:\Users\srdjan\Desktop\ESP32-P4C6 Demo Environment\ESP32-P4C6 Demo Environment\firmware\build\bootloader\esp-idf\esptool_py" && C:\Espressif\tools\python\v5.4.1\venv\Scripts\python.exe C:/Espressif/v5.4.1/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x2000 "C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/bootloader/bootloader.bin""
+Bootloader binary size 0x5700 bytes. 0x900 bytes (9%) free.
+ninja: build stopped: subcommand failed.

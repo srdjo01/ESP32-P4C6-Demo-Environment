@@ -7,7 +7,7 @@
 #include "cJSON.h"
 #include "esp_log.h"
 #include "esp_timer.h"
-#include "tinyusb_cdcacm.h"
+#include "tusb_cdc_acm.h"
 
 #include "gpio_module.h"
 #include "uart_module.h"

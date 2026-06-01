@@ -3,7 +3,7 @@ idf_component_register(
     INCLUDE_DIRS "include"
     PRIV_REQUIRES
         driver
-        esp_ldo_regulator
+        esp_hw_support
         esp_lcd_co5300
         esp_lvgl_port
         lvgl

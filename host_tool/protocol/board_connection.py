@@ -1,18 +1,5 @@
 """
 board_connection.py — serial port management and JSON framing.
-
-BoardConnection runs in a QThread.  It owns the serial port, reads lines,
-parses them as JSON, and emits signals that the UI panels connect to.
-
-Usage
-─────
-    conn = BoardConnection()
-    conn.message_received.connect(my_handler)   # dict per JSON line
-    conn.connected_changed.connect(on_connect)
-    conn.open("COM3", 115200)
-    ...
-    response = conn.send_command({"cmd": "ping"}, timeout=2.0)
-    conn.close()
 """
 
 from __future__ import annotations
@@ -26,6 +13,7 @@ import serial
 import serial.tools.list_ports
 
 from PyQt6.QtCore import QObject, QThread, pyqtSignal
+from PyQt6.QtWidgets import QApplication
 
 
 class _ReaderThread(QThread):
@@ -35,8 +23,8 @@ class _ReaderThread(QThread):
 
     def __init__(self, port: serial.Serial, parent: QObject | None = None):
         super().__init__(parent)
-        self._port   = port
-        self._stop   = threading.Event()
+        self._port  = port
+        self._stop  = threading.Event()
 
     def stop(self):
         self._stop.set()
@@ -62,15 +50,7 @@ class _ReaderThread(QThread):
 
 
 class BoardConnection(QObject):
-    """
-    Manages the serial connection to the ESP32-P4C6 board.
-
-    Signals
-    ───────
-    message_received(dict)   — emitted for every valid JSON line from the board
-    raw_line_received(str)   — emitted for every raw text line (for the log panel)
-    connected_changed(bool)  — emitted when connection state changes
-    """
+    """Manages the serial connection to the ESP32-P4C6 board."""
 
     message_received  = pyqtSignal(dict)
     raw_line_received = pyqtSignal(str)
@@ -81,17 +61,17 @@ class BoardConnection(QObject):
         self._port:   Optional[serial.Serial] = None
         self._reader: Optional[_ReaderThread] = None
         self._lock    = threading.Lock()
-        # Pending synchronous request waiting for a matching response.
-        self._pending_cmd:  Optional[str]   = None
-        self._pending_resp: Optional[dict]  = None
-        self._pending_evt   = threading.Event()
+        self._pending_cmd:      Optional[str]  = None
+        self._pending_resp:     Optional[dict] = None
+        self._pending_evt       = threading.Event()
+        self._in_send_command   = False
 
     # ── Connection management ───────────────────────────────────────────
 
     def open(self, port_name: str, baud: int = 115200) -> bool:
         try:
             p = serial.Serial(port_name, baud, timeout=0)
-        except serial.SerialException as e:
+        except serial.SerialException:
             return False
         with self._lock:
             self._port = p
@@ -102,13 +82,18 @@ class BoardConnection(QObject):
         return True
 
     def close(self):
+        # Unblock any waiting send_command call immediately.
+        self._pending_evt.set()
         if self._reader:
             self._reader.stop()
-            self._reader.wait(2000)
+            self._reader.wait(1000)
             self._reader = None
         with self._lock:
             if self._port and self._port.is_open:
-                self._port.close()
+                try:
+                    self._port.close()
+                except Exception:
+                    pass
             self._port = None
         self.connected_changed.emit(False)
 
@@ -120,43 +105,60 @@ class BoardConnection(QObject):
     # ── Sending ─────────────────────────────────────────────────────────
 
     def send_raw(self, obj: dict):
-        """Send a JSON command without waiting for a response."""
         line = json.dumps(obj, separators=(",", ":")) + "\n"
+        print(f"[TX] {line.strip()}", flush=True)
         with self._lock:
             if self._port and self._port.is_open:
-                self._port.write(line.encode())
+                try:
+                    self._port.write(line.encode())
+                except serial.SerialException as e:
+                    print(f"[WARN] send_raw failed: {e}", flush=True)
+                    self._port = None
 
     def send_command(self, obj: dict, timeout: float = 5.0) -> Optional[dict]:
         """
-        Send a command and block until the matching response arrives or timeout.
-        Returns the response dict, or None on timeout / disconnection.
+        Send a command and wait for the response.
+        Pumps Qt events every 50 ms so the UI stays responsive.
+        Re-entrant calls (from timers/slots inside processEvents) return None immediately.
         """
+        if self._in_send_command:
+            print(f"[WARN] re-entrant send_command({obj.get('cmd')}) blocked", flush=True)
+            return None
+        self._in_send_command = True
         cmd = obj.get("cmd")
-        with self._lock:
-            self._pending_cmd  = cmd
-            self._pending_resp = None
-            self._pending_evt.clear()
-        self.send_raw(obj)
-        self._pending_evt.wait(timeout)
-        with self._lock:
-            resp = self._pending_resp
-            self._pending_cmd  = None
-            self._pending_resp = None
-        return resp
+        try:
+            with self._lock:
+                self._pending_cmd  = cmd
+                self._pending_resp = None
+                self._pending_evt.clear()
+            self.send_raw(obj)
+            deadline = time.monotonic() + timeout
+            while time.monotonic() < deadline:
+                if self._pending_evt.wait(0.05):
+                    break
+                QApplication.processEvents()
+            with self._lock:
+                resp = self._pending_resp
+                self._pending_cmd  = None
+                self._pending_resp = None
+            print(f"[RX resp] cmd={cmd} resp={resp}", flush=True)
+            return resp
+        finally:
+            self._in_send_command = False
 
     # ── Receiving ───────────────────────────────────────────────────────
 
     def _on_line(self, text: str):
+        print(f"[RX] {text[:120]}", flush=True)
         self.raw_line_received.emit(text)
         try:
             obj = json.loads(text)
         except json.JSONDecodeError:
             return
         self.message_received.emit(obj)
-
-        # Wake up a blocking send_command() if this is its response.
         with self._lock:
             if self._pending_cmd and obj.get("cmd") == self._pending_cmd:
+                print(f"[RX] matched cmd={self._pending_cmd}, setting event", flush=True)
                 self._pending_resp = obj
                 self._pending_evt.set()
 
@@ -164,5 +166,4 @@ class BoardConnection(QObject):
 
     @staticmethod
     def list_ports() -> list[str]:
-        """Return sorted list of available COM/serial port names."""
         return sorted(p.device for p in serial.tools.list_ports.comports())

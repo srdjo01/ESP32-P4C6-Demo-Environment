@@ -5,6 +5,6 @@ idf_component_register(
         driver
         fatfs
         sdmmc
-        esp_ldo_regulator
+        esp_hw_support
         esp_timer
 )
