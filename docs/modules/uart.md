@@ -59,8 +59,8 @@ Send a string → immediately receive it back.
 ```
 ESP32-P4 CN3          Arduino Uno
 ──────────────────────────────────
-GPIO4 (RX)   ←──── TX (pin 1)
-GPIO5 (TX)   ────→ RX (pin 0)
+GPIO4 (TX)   ────→ RX (pin 0)
+GPIO5 (RX)   ←──── TX (pin 1)
 GND          ────── GND
 ```
 

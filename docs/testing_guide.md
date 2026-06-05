@@ -46,7 +46,7 @@ No external wiring for read-back test; you need a 12/24 V source to trigger HIGH
 
 **Loopback test (simplest):**
 
-Wire a jumper between **CN3 RX (GPIO4)** and **CN3 TX (GPIO5)** directly on the connector.
+Wire a jumper between **CN3 TX (GPIO4)** and **CN3 RX (GPIO5)** directly on the connector.
 
 1. Open the **UART** tab, select **CN3**.
 2. Type any text in the send box and click **Send**.
@@ -107,8 +107,8 @@ It is useful for debugging if a command returns an unexpected error.
 ```
 Board CN3 connector
 ───────────────────
-  Pin 1  GPIO4  RX  ─────┐
-  Pin 2  GPIO5  TX  ─────┘  (bridge RX↔TX for loopback)
+  Pin 1  GPIO4  TX  ─────┐
+  Pin 2  GPIO5  RX  ─────┘  (bridge TX↔RX for loopback)
   Pin 3  GND
 ```
 

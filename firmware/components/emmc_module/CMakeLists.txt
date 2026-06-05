@@ -3,7 +3,6 @@ idf_component_register(
     INCLUDE_DIRS "include"
     PRIV_REQUIRES
         driver
-        fatfs
         sdmmc
         esp_hw_support
         esp_timer

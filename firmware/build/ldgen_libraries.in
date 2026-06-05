@@ -88,6 +88,10 @@ $<TARGET_FILE:__idf_gpio_module>
 $<TARGET_FILE:__idf_uart_module>
 $<TARGET_FILE:__idf_i2c_module>
 $<TARGET_FILE:__idf_emmc_module>
+$<TARGET_FILE:__idf_espressif__esp_serial_slave_link>
+$<TARGET_FILE:__idf_espressif__eppp_link>
+$<TARGET_FILE:__idf_espressif__esp_hosted>
+$<TARGET_FILE:__idf_espressif__esp_wifi_remote>
 $<TARGET_FILE:__idf_wifi_module>
 $<TARGET_FILE:__idf_espressif__esp_lcd_co5300>
 $<TARGET_FILE:__idf_lvgl__lvgl>

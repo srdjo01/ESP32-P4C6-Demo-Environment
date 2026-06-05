@@ -16,16 +16,16 @@ Waveshare ESP32-P4 module via MMC_* nets.
 
 | Signal | GPIO |
 |--------|------|
-| CLK    | 41   |
-| CMD    | 40   |
-| D0     | 46   |
-| D1     | 47   |
-| D2     | 48   |
-| D3     | 44   |
-| D4     | 45   |
-| D5     | 43   |
-| D6     | 42   |
-| D7     | 49   |
+| CLK    | 40   |
+| CMD    | 39   |
+| D0     | 45   |
+| D1     | 46   |
+| D2     | 47   |
+| D3     | 43   |
+| D4     | 44   |
+| D5     | 42   |
+| D6     | 41   |
+| D7     | 48   |
 
 **LDO channel 4** is enabled at **1.8 V** before every mount and released after.
 
@@ -40,10 +40,17 @@ Waveshare ESP32-P4 module via MMC_* nets.
 | 40000 | 40 MHz (high speed) — tested PASS on boards #1–5 |
 | 52000 | 52 MHz (max for standard HS mode) |
 
-## Test pattern
+## Test method
 
-Each byte position `i` is filled with `i & 0xFF` (repeating 0x00–0xFF).
-The pattern is written in 512-byte chunks and verified byte-by-byte on read.
+The test writes directly to raw eMMC sectors via `sdmmc_write_sectors` /
+`sdmmc_read_sectors`, **bypassing the FAT filesystem entirely**. This tests the
+eMMC hardware itself rather than a filesystem layer, and avoids corruption
+issues from a stale or damaged FAT.
+
+The test region starts at sector `0x100000` (~512 MB into the device), well
+clear of any boot/partition structures. Each byte position `i` is filled with
+`i & 0xFF` (repeating 0x00–0xFF), written in 32 KB blocks and verified
+byte-by-byte on read.
 
 ## Public API
 

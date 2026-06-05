@@ -23,10 +23,14 @@ static const char *TAG = "display_module";
 #define DISP_WIDTH   466
 #define DISP_HEIGHT  466
 
-/* MIPI DSI configuration — 2 data lanes, ~500 Mbps/lane for 466×466 RGB565 @60 Hz.
- * Adjust lane_bit_rate_mbps if the display shows artefacts (try 400 or 600). */
-#define MIPI_DSI_LANE_NUM         2
-#define MIPI_DSI_LANE_BITRATE_MBS 500
+/* Panel reset GPIO — confirmed from co5300_test reference (PIN_RST=13).
+ * Without a hardware reset pulse the CO5300 does not initialise reliably. */
+#define DISP_RST_GPIO  13
+
+/* MIPI DSI configuration — 1 data lane @ 480 Mbps, matching the proven
+ * co5300_test reference (CO5300_PANEL_BUS_DSI_1CH_CONFIG). */
+#define MIPI_DSI_LANE_NUM         1
+#define MIPI_DSI_LANE_BITRATE_MBS 480
 
 /* Touch controller CST820B (on a separate I2C bus from the sensors). */
 #define TOUCH_I2C_PORT   I2C_NUM_1
@@ -148,8 +152,8 @@ int display_module_init(void)
     };
     esp_lcd_panel_dev_config_t panel_dev_cfg = {
         .bits_per_pixel = 16,
-        .reset_gpio_num = -1,
-        .rgb_ele_order  = LCD_RGB_ELEMENT_ORDER_RGB,
+        .reset_gpio_num = DISP_RST_GPIO,
+        .rgb_ele_order  = LCD_RGB_ELEMENT_ORDER_BGR,
         .vendor_config  = &vendor_cfg,
     };
     ret = esp_lcd_new_panel_co5300(io, &panel_dev_cfg, &s_panel);
@@ -159,9 +163,21 @@ int display_module_init(void)
         return -1;
     }
 
-    ESP_ERROR_CHECK(esp_lcd_panel_reset(s_panel));
-    ESP_ERROR_CHECK(esp_lcd_panel_init(s_panel));
-    ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(s_panel, true));
+    /* Non-fatal: a failure here must NOT abort the board (would cause a reboot
+     * loop and kill the USB CDC link). Log and bail out cleanly instead. */
+    ret = esp_lcd_panel_reset(s_panel);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "panel_reset failed: %s", esp_err_to_name(ret));
+        return -1;
+    }
+    ret = esp_lcd_panel_init(s_panel);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "panel_init failed: %s", esp_err_to_name(ret));
+        return -1;
+    }
+    ESP_LOGI(TAG, "CO5300 panel reset + init OK");
+    /* Note: CO5300 over MIPI DPI turns on during init — it does NOT support
+     * esp_lcd_panel_disp_on_off (the reference co5300_test omits it too). */
 
     /* ── LVGL port ── */
     const lvgl_port_cfg_t lvgl_cfg = ESP_LVGL_PORT_INIT_CONFIG();
@@ -170,23 +186,31 @@ int display_module_init(void)
         ESP_LOGE(TAG, "LVGL port init failed: %s", esp_err_to_name(ret));
         return -1;
     }
+    ESP_LOGI(TAG, "LVGL port init OK, adding display...");
 
     const lvgl_port_display_cfg_t disp_cfg = {
         .io_handle     = io,
         .panel_handle  = s_panel,
-        .buffer_size   = DISP_WIDTH * 50,  /* 50 lines worth of pixels */
-        .double_buffer = true,
+        .buffer_size   = DISP_WIDTH * DISP_HEIGHT,  /* full-screen buffer in PSRAM */
+        .double_buffer = false,
         .hres          = DISP_WIDTH,
         .vres          = DISP_HEIGHT,
         .monochrome    = false,
         .rotation      = { .swap_xy = false, .mirror_x = false, .mirror_y = false },
-        .flags         = { .buff_dma = true },
+        .flags         = { .buff_dma = false, .buff_spiram = true },
     };
-    s_disp = lvgl_port_add_disp(&disp_cfg);
+    /* CO5300 is a MIPI-DSI (DPI) panel — it must use lvgl_port_add_disp_dsi,
+     * which registers the DPI flush callback. The generic lvgl_port_add_disp
+     * tries to flush via panel_io (a NULL op on DPI panels) and crashes. */
+    const lvgl_port_display_dsi_cfg_t dsi_cfg = {
+        .flags = { .avoid_tearing = false },
+    };
+    s_disp = lvgl_port_add_disp_dsi(&disp_cfg, &dsi_cfg);
     if (!s_disp) {
-        ESP_LOGE(TAG, "lvgl_port_add_disp failed");
+        ESP_LOGE(TAG, "lvgl_port_add_disp_dsi failed");
         return -1;
     }
+    ESP_LOGI(TAG, "LVGL DSI display added");
 
     /* Build both screens up-front so switching is instant. */
     lvgl_port_lock(0);

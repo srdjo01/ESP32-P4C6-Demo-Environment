@@ -8,6 +8,8 @@
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "tusb_cdc_acm.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #include "gpio_module.h"
 #include "uart_module.h"
@@ -258,15 +260,13 @@ static void handle_i2c_read(cJSON *root)
     proto_send(resp);
 }
 
-static void handle_emmc_test(cJSON *root)
-{
-    cJSON *jfreq = cJSON_GetObjectItem(root, "freq_khz");
-    cJSON *jsize = cJSON_GetObjectItem(root, "size_kb");
-    int freq_khz = cJSON_IsNumber(jfreq) ? jfreq->valueint : 40000;
-    int size_kb  = cJSON_IsNumber(jsize) ? jsize->valueint : 64;
+typedef struct { int freq_khz; int size_kb; } emmc_task_args_t;
 
+static void emmc_test_task(void *arg)
+{
+    emmc_task_args_t *a = (emmc_task_args_t *)arg;
     emmc_test_result_t result;
-    emmc_module_run_test(freq_khz, size_kb, &result);
+    emmc_module_run_test(a->freq_khz, a->size_kb, &result);
 
     char resp[PROTO_RESP_MAX];
     snprintf(resp, sizeof(resp),
@@ -274,12 +274,30 @@ static void handle_emmc_test(cJSON *root)
              "\"freq_khz\":%d,\"size_kb\":%d,"
              "\"write_ok\":%s,\"read_ok\":%s,\"verify_ok\":%s,"
              "\"duration_ms\":%lu}",
-             freq_khz, size_kb,
+             a->freq_khz, a->size_kb,
              result.write_ok  ? "true" : "false",
              result.read_ok   ? "true" : "false",
              result.verify_ok ? "true" : "false",
              result.duration_ms);
     proto_send(resp);
+    free(a);
+    vTaskDelete(NULL);
+}
+
+static void handle_emmc_test(cJSON *root)
+{
+    cJSON *jfreq = cJSON_GetObjectItem(root, "freq_khz");
+    cJSON *jsize = cJSON_GetObjectItem(root, "size_kb");
+
+    emmc_task_args_t *a = malloc(sizeof(emmc_task_args_t));
+    if (!a) { proto_send_error("emmc_test", "out of memory"); return; }
+    a->freq_khz = cJSON_IsNumber(jfreq) ? jfreq->valueint : 40000;
+    a->size_kb  = cJSON_IsNumber(jsize) ? jsize->valueint : 64;
+
+    if (xTaskCreate(emmc_test_task, "emmc_test", 16384, a, 5, NULL) != pdPASS) {
+        proto_send_error("emmc_test", "task create failed");
+        free(a);
+    }
 }
 
 static void handle_wifi_scan(void)

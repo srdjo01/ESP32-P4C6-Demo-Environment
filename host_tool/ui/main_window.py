@@ -22,6 +22,7 @@ from ui.uart_panel       import UartPanel
 from ui.i2c_panel        import I2cPanel
 from ui.emmc_panel       import EmmcPanel
 from ui.wifi_panel       import WifiPanel
+from ui.bluetooth_panel  import BluetoothPanel
 from ui.display_panel    import DisplayPanel
 from ui.usb_serial_panel import UsbSerialPanel
 
@@ -35,6 +36,10 @@ class MainWindow(QMainWindow):
         self._conn = BoardConnection(self)
         self._conn.connected_changed.connect(self._on_connection_changed)
         self._conn.message_received.connect(self._on_message)
+
+        # Separate connection to the ESP32-C6 Wi-Fi/BLE co-processor (CH340 port).
+        self._c6_conn = BoardConnection(self)
+        self._c6_conn.connected_changed.connect(self._on_c6_connection_changed)
 
         self._build_ui()
         self._refresh_ports()
@@ -89,6 +94,24 @@ class MainWindow(QMainWindow):
         self._conn_label = QLabel("Disconnected")
         layout.addWidget(self._conn_label)
 
+        layout.addSpacing(20)
+
+        # ── ESP32-C6 (Wi-Fi/BLE) port ──
+        layout.addWidget(QLabel("C6 port:"))
+        self._c6_port_combo = QComboBox()
+        self._c6_port_combo.setMinimumWidth(120)
+        layout.addWidget(self._c6_port_combo)
+
+        self._btn_c6_connect = QPushButton("Connect C6")
+        self._btn_c6_connect.setFixedWidth(100)
+        self._btn_c6_connect.clicked.connect(self._toggle_c6_connection)
+        layout.addWidget(self._btn_c6_connect)
+
+        self._c6_dot = QLabel("●")
+        self._c6_dot.setFont(QFont("Arial", 14))
+        self._c6_dot.setStyleSheet("color: #e74c3c;")
+        layout.addWidget(self._c6_dot)
+
         layout.addStretch()
 
         btn_ping = QPushButton("Ping board")
@@ -106,6 +129,7 @@ class MainWindow(QMainWindow):
         tabs.addTab(I2cPanel(self._conn),          "I2C Sensors")
         tabs.addTab(EmmcPanel(self._conn),         "eMMC")
         tabs.addTab(WifiPanel(self._conn),         "Wi-Fi")
+        tabs.addTab(BluetoothPanel(self._conn),    "Bluetooth")
         tabs.addTab(DisplayPanel(self._conn),      "Display")
         tabs.addTab(UsbSerialPanel(self._conn),    "USB Serial Log")
         return tabs
@@ -113,14 +137,15 @@ class MainWindow(QMainWindow):
     # ── Connection management ───────────────────────────────────────────
 
     def _refresh_ports(self):
-        current = self._port_combo.currentText()
-        self._port_combo.clear()
-        for p in BoardConnection.list_ports():
-            self._port_combo.addItem(p)
-        # Restore previous selection if still present
-        idx = self._port_combo.findText(current)
-        if idx >= 0:
-            self._port_combo.setCurrentIndex(idx)
+        ports = BoardConnection.list_ports()
+        for combo in (self._port_combo, self._c6_port_combo):
+            current = combo.currentText()
+            combo.clear()
+            for p in ports:
+                combo.addItem(p)
+            idx = combo.findText(current)
+            if idx >= 0:
+                combo.setCurrentIndex(idx)
 
     def _toggle_connection(self):
         if self._conn.is_connected:
@@ -145,6 +170,29 @@ class MainWindow(QMainWindow):
             self._status_dot.setStyleSheet("color: #e74c3c;")
             self._conn_label.setText("Disconnected")
             self._set_status("Disconnected")
+
+    # ── ESP32-C6 connection ─────────────────────────────────────────────
+
+    def _toggle_c6_connection(self):
+        if self._c6_conn.is_connected:
+            self._c6_conn.close()
+        else:
+            port = self._c6_port_combo.currentText()
+            if not port:
+                self._set_status("No C6 port selected")
+                return
+            # C6 firmware runs the JSON protocol at 115200 over the CH340.
+            if not self._c6_conn.open(port, 115200):
+                self._set_status(f"Failed to open C6 port {port}")
+
+    def _on_c6_connection_changed(self, connected: bool):
+        if connected:
+            self._btn_c6_connect.setText("Disconnect C6")
+            self._c6_dot.setStyleSheet("color: #2ecc71;")
+            self._set_status(f"C6 connected — {self._c6_port_combo.currentText()}")
+        else:
+            self._btn_c6_connect.setText("Connect C6")
+            self._c6_dot.setStyleSheet("color: #e74c3c;")
 
     def _on_message(self, msg: dict):
         if msg.get("event") == "ready":
@@ -173,4 +221,5 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         self._conn.close()
+        self._c6_conn.close()
         super().closeEvent(event)

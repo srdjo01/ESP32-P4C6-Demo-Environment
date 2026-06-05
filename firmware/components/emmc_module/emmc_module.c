@@ -1,12 +1,10 @@
 #include "emmc_module.h"
 
 #include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
 #include "driver/sdmmc_host.h"
 #include "esp_ldo_regulator.h"
+#include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
@@ -14,31 +12,35 @@
 
 static const char *TAG = "emmc_module";
 
-#define MOUNT_POINT  "/eMMC"
-#define TEST_FILE    MOUNT_POINT "/p4c6_test.bin"
-
 /* LDO channel 4 powers the eMMC 1.8 V I/O — must stay enabled during use. */
 #define LDO_CHANNEL   4
 #define LDO_VOLTAGE   1800
 
 /*
- * eMMC SDMMC GPIO map — verified from SCH_Schematic_2026-05-11.pdf.
- * The eMMC (U9, KLM8G1GETF-B041) is connected internally on the
- * Waveshare ESP32-P4 module via the MMC_* nets.
+ * eMMC SDMMC GPIO map — verified from SCH_Schematic_2026-05-11.pdf page 7
+ * and the working ESP32P4Dev/Test Examples/P4/emmc reference.
  */
-#define EMMC_CLK_GPIO  41
-#define EMMC_CMD_GPIO  40
-#define EMMC_D0_GPIO   46
-#define EMMC_D1_GPIO   47
-#define EMMC_D2_GPIO   48
-#define EMMC_D3_GPIO   44
-#define EMMC_D4_GPIO   45
-#define EMMC_D5_GPIO   43
-#define EMMC_D6_GPIO   42
-#define EMMC_D7_GPIO   49
+#define EMMC_CLK_GPIO  40
+#define EMMC_CMD_GPIO  39
+#define EMMC_D0_GPIO   45
+#define EMMC_D1_GPIO   46
+#define EMMC_D2_GPIO   47
+#define EMMC_D3_GPIO   43
+#define EMMC_D4_GPIO   44
+#define EMMC_D5_GPIO   42
+#define EMMC_D6_GPIO   41
+#define EMMC_D7_GPIO   48
 
-/* Test pattern: repeating 0x00–0xFF sequence. */
-#define PATTERN_CHUNK  512
+/*
+ * Raw sector test region. We bypass FAT entirely and read/write sectors
+ * directly via the SDMMC driver — this tests the eMMC hardware itself, not
+ * a filesystem layer. START_SECTOR sits ~512 MB into the device, far from
+ * any boot/partition structures at the start of the card.
+ */
+#define SECTOR_SIZE    512
+#define START_SECTOR   0x100000          /* 1,048,576 → ~512 MB offset       */
+#define BLOCK_SECTORS  64                /* 32 KB per DMA transfer           */
+#define BLOCK_BYTES    (BLOCK_SECTORS * SECTOR_SIZE)
 
 static bool s_init = false;
 
@@ -55,19 +57,20 @@ static esp_ldo_channel_handle_t acquire_ldo(void)
         ESP_LOGE(TAG, "Failed to acquire LDO ch%d", LDO_CHANNEL);
         return NULL;
     }
+    /* Allow eMMC VCCQ to stabilise before first command. */
+    vTaskDelay(pdMS_TO_TICKS(100));
     return ldo;
 }
 
-static int mount_emmc(int freq_khz, sdmmc_card_t **card_out)
+/*
+ * Initialise the eMMC card (no filesystem). Fills *card and leaves the SDMMC
+ * host running; caller must sdmmc_host_deinit() when done. Returns 0 on ok.
+ */
+static int init_card(int freq_khz, sdmmc_card_t *card)
 {
-    esp_vfs_fat_sdmmc_mount_config_t mount_cfg = {
-        .format_if_mount_failed = true,
-        .max_files              = 4,
-        .allocation_unit_size   = 16 * 1024,
-    };
-
     sdmmc_host_t host = SDMMC_HOST_DEFAULT();
     host.max_freq_khz = freq_khz;
+    host.flags        = SDMMC_HOST_FLAG_8BIT | SDMMC_HOST_FLAG_DDR;
 
     sdmmc_slot_config_t slot = {
         .cd    = SDMMC_SLOT_NO_CD,
@@ -86,13 +89,26 @@ static int mount_emmc(int freq_khz, sdmmc_card_t **card_out)
     };
     slot.flags |= SDMMC_SLOT_FLAG_INTERNAL_PULLUP;
 
-    esp_err_t ret = esp_vfs_fat_sdmmc_mount(MOUNT_POINT, &host, &slot,
-                                             &mount_cfg, card_out);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Mount failed at %d kHz: %s", freq_khz, esp_err_to_name(ret));
+    esp_err_t err = sdmmc_host_init();
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "sdmmc_host_init failed: %s", esp_err_to_name(err));
         return -1;
     }
-    sdmmc_card_print_info(stdout, *card_out);
+    /* Use host.slot (default SLOT_1) — slot 1 supports GPIO-matrix routing,
+     * which these non-IOMUX pins require. Slot 0 is dedicated-IOMUX only. */
+    err = sdmmc_host_init_slot(host.slot, &slot);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "init_slot failed: %s", esp_err_to_name(err));
+        sdmmc_host_deinit();
+        return -1;
+    }
+    err = sdmmc_card_init(&host, card);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "card_init failed at %d kHz: %s", freq_khz, esp_err_to_name(err));
+        sdmmc_host_deinit();
+        return -1;
+    }
+    sdmmc_card_print_info(stdout, card);
     return 0;
 }
 
@@ -100,14 +116,13 @@ static int mount_emmc(int freq_khz, sdmmc_card_t **card_out)
 
 int emmc_module_init(void)
 {
-    /* Quick probe: try mounting at 20 MHz and immediately unmount. */
     esp_ldo_channel_handle_t ldo = acquire_ldo();
     if (!ldo) return -1;
 
-    sdmmc_card_t *card = NULL;
-    int rc = mount_emmc(20000, &card);
+    sdmmc_card_t card;
+    int rc = init_card(20000, &card);
     if (rc == 0) {
-        esp_vfs_fat_sdcard_unmount(MOUNT_POINT, card);
+        sdmmc_host_deinit();
         s_init = true;
         ESP_LOGI(TAG, "eMMC probe OK");
     }
@@ -130,74 +145,66 @@ int emmc_module_run_test(int freq_khz, int size_kb, emmc_test_result_t *result)
     esp_ldo_channel_handle_t ldo = acquire_ldo();
     if (!ldo) return -1;
 
-    sdmmc_card_t *card = NULL;
-    if (mount_emmc(freq_khz, &card) != 0) {
+    sdmmc_card_t card;
+    if (init_card(freq_khz, &card) != 0) {
         esp_ldo_release_channel(ldo);
+        result->duration_ms = (uint32_t)((esp_timer_get_time() - t_start) / 1000);
         return -1;
     }
 
-    /* ── Write phase ── */
-    FILE *f = fopen(TEST_FILE, "wb");
-    if (!f) {
-        ESP_LOGE(TAG, "Cannot open test file for writing");
+    /* DMA-capable transfer buffer (one block at a time). */
+    uint8_t *buf = heap_caps_malloc(BLOCK_BYTES, MALLOC_CAP_DMA);
+    if (!buf) {
+        ESP_LOGE(TAG, "Cannot allocate DMA buffer");
         goto cleanup;
     }
 
-    uint8_t chunk[PATTERN_CHUNK];
-    size_t total_bytes = (size_t)size_kb * 1024;
-    bool write_ok = true;
+    size_t total_sectors = ((size_t)size_kb * 1024 + SECTOR_SIZE - 1) / SECTOR_SIZE;
 
-    for (size_t written = 0; written < total_bytes; written += PATTERN_CHUNK) {
-        size_t to_write = (total_bytes - written < PATTERN_CHUNK)
-                          ? (total_bytes - written) : PATTERN_CHUNK;
-        for (size_t j = 0; j < to_write; j++) {
-            chunk[j] = (uint8_t)((written + j) & 0xFF);
+    /* ── Write phase ── */
+    bool write_ok = true;
+    for (size_t sec = 0; sec < total_sectors; sec += BLOCK_SECTORS) {
+        size_t n = (total_sectors - sec < BLOCK_SECTORS)
+                   ? (total_sectors - sec) : BLOCK_SECTORS;
+        for (size_t i = 0; i < n * SECTOR_SIZE; i++) {
+            buf[i] = (uint8_t)((sec * SECTOR_SIZE + i) & 0xFF);
         }
-        if (fwrite(chunk, 1, to_write, f) != to_write) {
+        if (sdmmc_write_sectors(&card, buf, START_SECTOR + sec, n) != ESP_OK) {
             write_ok = false;
             break;
         }
     }
-    fclose(f);
     result->write_ok = write_ok;
-
-    if (!write_ok) goto cleanup;
-
-    /* ── Read-back and verify phase ── */
-    f = fopen(TEST_FILE, "rb");
-    if (!f) {
-        ESP_LOGE(TAG, "Cannot open test file for reading");
-        goto cleanup;
+    if (!write_ok) {
+        ESP_LOGE(TAG, "sdmmc_write_sectors failed");
+        goto free_cleanup;
     }
 
+    /* ── Read-back and verify phase ── */
     result->read_ok   = true;
     result->verify_ok = true;
-    size_t verified   = 0;
-
-    while (verified < total_bytes) {
-        size_t to_read = (total_bytes - verified < PATTERN_CHUNK)
-                         ? (total_bytes - verified) : PATTERN_CHUNK;
-        size_t got = fread(chunk, 1, to_read, f);
-        if (got != to_read) {
+    for (size_t sec = 0; sec < total_sectors; sec += BLOCK_SECTORS) {
+        size_t n = (total_sectors - sec < BLOCK_SECTORS)
+                   ? (total_sectors - sec) : BLOCK_SECTORS;
+        memset(buf, 0, n * SECTOR_SIZE);
+        if (sdmmc_read_sectors(&card, buf, START_SECTOR + sec, n) != ESP_OK) {
             result->read_ok = false;
             break;
         }
-        for (size_t j = 0; j < got; j++) {
-            if (chunk[j] != (uint8_t)((verified + j) & 0xFF)) {
+        for (size_t i = 0; i < n * SECTOR_SIZE; i++) {
+            if (buf[i] != (uint8_t)((sec * SECTOR_SIZE + i) & 0xFF)) {
                 result->verify_ok = false;
                 break;
             }
         }
         if (!result->verify_ok) break;
-        verified += got;
     }
-    fclose(f);
 
-    /* Remove test file. */
-    unlink(TEST_FILE);
+free_cleanup:
+    free(buf);
 
 cleanup:
-    esp_vfs_fat_sdcard_unmount(MOUNT_POINT, card);
+    sdmmc_host_deinit();
     esp_ldo_release_channel(ldo);
 
     result->duration_ms = (uint32_t)((esp_timer_get_time() - t_start) / 1000);

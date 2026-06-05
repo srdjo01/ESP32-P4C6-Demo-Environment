@@ -37,7 +37,7 @@ class _TestWorker(QThread):
     def run(self):
         resp = self._conn.send_command(
             cmd_emmc_test(self._freq_khz, self._size_kb),
-            timeout=60.0
+            timeout=300.0
         )
         self.finished.emit(resp or {})
 

@@ -79,6 +79,12 @@ def cmd_wifi_ping(host: str) -> dict:
     return {"cmd": "wifi_ping", "host": host}
 
 
+# ── Bluetooth (ESP32-C6) ─────────────────────────────────────────────────────
+
+def cmd_ble_scan() -> dict:
+    return {"cmd": "ble_scan"}
+
+
 # ── Display ──────────────────────────────────────────────────────────────────
 
 def cmd_display_pattern() -> dict:

@@ -95,8 +95,10 @@ static void init_modules_hw(void *arg)
         ESP_LOGW(TAG, "Wi-Fi module init failed — ESP-Hosted may not be configured");
     }
 
-    /* Display: skipped — MIPI DSI blocks if panel is not connected. */
-    ESP_LOGW(TAG, "Display module init skipped (connect display hardware first)");
+    ESP_LOGI(TAG, "Initialising Display module...");
+    if (display_module_init() != 0) {
+        ESP_LOGW(TAG, "Display module init failed — check panel/FPC connection");
+    }
 
     proto_send("{\"event\":\"hw_ready\",\"i2c\":1,\"emmc\":1}");
     vTaskDelete(NULL);

@@ -13,6 +13,9 @@ Controls the **466×466 MIPI DSI round display** using:
 | Color format | RGB565 (16-bit) — RGB888 has known instability |
 | UI library | LVGL v8 via `espressif/esp_lvgl_port` |
 | Power | LDO channel 3 at 2500 mV |
+| Reset GPIO | 13 (required — panel won't init without reset pulse) |
+| RGB order | BGR |
+| MIPI DSI | 1 data lane @ 480 Mbps |
 
 ## ⚠ Hardware warning
 
@@ -27,8 +30,8 @@ This caused cable damage on board #5 and possible MIPI DSI PHY damage.
 ## Initialisation sequence
 
 1. Enable LDO ch3 at 2500 mV
-2. Create MIPI DSI bus (2 lanes, 500 Mbps/lane)
-3. Create CO5300 panel via `esp_lcd_new_panel_co5300()`
+2. Create MIPI DSI bus (1 lane, 480 Mbps)
+3. Create CO5300 panel via `esp_lcd_new_panel_co5300()` (reset GPIO 13, BGR order)
 4. Reset and init panel, turn display on
 5. Init LVGL port and register display
 6. Pre-create two LVGL screens: pattern and text

@@ -4,12 +4,11 @@
 static const char *TAG = "wifi_module";
 
 /*
- * Wi-Fi requires the ESP32-C6 co-processor running ESP-Hosted slave firmware.
- * Until CONFIG_ESP_HOSTED_ENABLED is set and the C6 is flashed, all functions
- * return -1 so the rest of the firmware continues normally.
+ * Wi-Fi is provided by the ESP32-C6 over SDIO via ESP-Hosted. The
+ * esp_wifi_remote component transparently forwards the esp_wifi_* calls below
+ * to the C6, so this is the standard esp_wifi STA flow — it just runs over the
+ * SDIO link. The C6 must be flashed with the matching ESP-Hosted slave firmware.
  */
-
-#if defined(CONFIG_ESP_HOSTED_ENABLED)
 
 #include <string.h>
 #include "esp_wifi.h"
@@ -170,36 +169,3 @@ int wifi_module_ping(const char *host, uint32_t *latency_ms_out)
     *latency_ms_out = elapsed;
     return 0;
 }
-
-#else  /* CONFIG_ESP_HOSTED_ENABLED not set */
-
-int wifi_module_init(void)
-{
-    ESP_LOGW(TAG, "Wi-Fi not available — flash ESP-Hosted firmware to C6 and enable CONFIG_ESP_HOSTED_ENABLED");
-    return -1;
-}
-
-int wifi_module_scan(wifi_scan_result_t *results, int max, int *count_out)
-{
-    (void)results; (void)max;
-    *count_out = 0;
-    return -1;
-}
-
-int wifi_module_connect(const char *ssid, const char *password,
-                        char *ip_buf, int ip_buf_len)
-{
-    (void)ssid; (void)password; (void)ip_buf; (void)ip_buf_len;
-    return -1;
-}
-
-void wifi_module_disconnect(void) {}
-
-int wifi_module_ping(const char *host, uint32_t *latency_ms_out)
-{
-    (void)host;
-    *latency_ms_out = 0;
-    return -1;
-}
-
-#endif /* CONFIG_ESP_HOSTED_ENABLED */

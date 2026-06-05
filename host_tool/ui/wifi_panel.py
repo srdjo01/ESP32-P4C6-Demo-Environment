@@ -41,9 +41,9 @@ class WifiPanel(QWidget):
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         info = QLabel(
-            "Wi-Fi is provided by the ESP32-C6 co-processor via SDIO (ESP-Hosted).\n"
-            "The ESP32-C6 must be flashed with the ESP-Hosted slave firmware.\n"
-            "GPIO 14–19 (P4) ↔ GPIO 18–23 (C6) carry the SDIO signals."
+            "Wi-Fi is provided by the ESP32-C6 over SDIO (ESP-Hosted). The P4 runs\n"
+            "esp_wifi_remote, so Wi-Fi works through the normal P4 connection —\n"
+            "no separate C6 port needed. Scan / connect / ping below."
         )
         info.setWordWrap(True)
         layout.addWidget(info)
