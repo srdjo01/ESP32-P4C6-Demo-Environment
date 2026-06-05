@@ -6,10 +6,13 @@
 
 static const char *TAG = "uart_module";
 
-/* CN3 — verified in UART CN3 Test DONE.md */
+/*
+ * CN3 — GPIO4=TX, GPIO5=RX confirmed from uart_echo Kconfig defaults
+ * (Test Examples/P4/uart_echo/main/Kconfig.projbuild: TXD=4, RXD=5).
+ */
 #define CN3_PORT      UART_NUM_1
-#define CN3_RX_GPIO   4
-#define CN3_TX_GPIO   5
+#define CN3_TX_GPIO   4
+#define CN3_RX_GPIO   5
 
 /*
  * CN4 — 5 V UART with on-board transistor level-shifter (Q3/Q4).
@@ -73,4 +76,10 @@ int uart_module_recv(int port, uint8_t *buf, size_t max_len, int timeout_ms)
     int ticks = timeout_ms / portTICK_PERIOD_MS;
     if (ticks <= 0) ticks = 1;
     return uart_read_bytes(p, buf, max_len, ticks);
+}
+
+void uart_module_flush_rx(int port)
+{
+    uart_port_t p = port_num(port);
+    if ((int)p >= 0) uart_flush_input(p);
 }

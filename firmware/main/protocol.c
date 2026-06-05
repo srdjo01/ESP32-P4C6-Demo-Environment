@@ -175,6 +175,7 @@ static void handle_uart_send(cJSON *root)
         proto_send_error("uart_send", "base64 decode failed");
         return;
     }
+    uart_module_flush_rx(jport->valueint);
     int sent = uart_module_send(jport->valueint, buf, (size_t)len);
     if (sent < 0) {
         proto_send_error("uart_send", "invalid port");

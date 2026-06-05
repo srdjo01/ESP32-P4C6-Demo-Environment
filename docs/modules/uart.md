@@ -6,10 +6,10 @@
 
 Two UART ports are exposed — both verified from **SCH_Schematic_2026-05-11.pdf**:
 
-| Label | ESP-IDF port | RX GPIO | TX GPIO | Voltage | Connector |
+| Label | ESP-IDF port | TX GPIO | RX GPIO | Voltage | Connector |
 |-------|-------------|---------|---------|---------|-----------|
 | CN3   | UART_NUM_1  | GPIO 4  | GPIO 5  | 3.3 V   | CN3 header |
-| CN4   | UART_NUM_2  | GPIO 6  | GPIO 7  | **5 V** | CN4 header |
+| CN4   | UART_NUM_2  | GPIO 7  | GPIO 6  | **5 V** | CN4 header |
 
 Configuration: **115200 baud, 8N1, no flow control**.
 
@@ -47,8 +47,8 @@ Data is **Base64-encoded** in both directions.
 ```
 CN3 connector
 ─────────────
-Pin 1  GPIO4  RX ──┐
-Pin 2  GPIO5  TX ──┘  jumper wire
+Pin 1  GPIO4  TX ──┐
+Pin 2  GPIO5  RX ──┘  jumper wire
 Pin 3  GND
 ```
 

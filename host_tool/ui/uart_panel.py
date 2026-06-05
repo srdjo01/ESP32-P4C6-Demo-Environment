@@ -104,6 +104,6 @@ class UartPanel(QWidget):
             self._recv_log.append(f"[RX ← port {self._current_port()}] (no data)")
         else:
             text = "".join(
-                chr(b) if 32 <= b < 127 else f"\\x{b:02X}" for b in raw
+                chr(b) if 32 <= b < 127 else f"\\x{b:02X}" for b in raw.rstrip(b"\r\n")
             )
             self._recv_log.append(f"[RX ← port {self._current_port()}] {text}")
