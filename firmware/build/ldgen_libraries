@@ -88,10 +88,6 @@ C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/
 C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/esp-idf/uart_module/libuart_module.a
 C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/esp-idf/i2c_module/libi2c_module.a
 C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/esp-idf/emmc_module/libemmc_module.a
-C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/esp-idf/espressif__esp_serial_slave_link/libespressif__esp_serial_slave_link.a
-C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/esp-idf/espressif__eppp_link/libespressif__eppp_link.a
-C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/esp-idf/espressif__esp_hosted/libespressif__esp_hosted.a
-C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/esp-idf/espressif__esp_wifi_remote/libespressif__esp_wifi_remote.a
 C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/esp-idf/wifi_module/libwifi_module.a
 C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/esp-idf/espressif__esp_lcd_co5300/libespressif__esp_lcd_co5300.a
 C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/esp-idf/lvgl__lvgl/liblvgl__lvgl.a

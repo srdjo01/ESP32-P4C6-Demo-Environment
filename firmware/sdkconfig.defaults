@@ -2,7 +2,7 @@
 CONFIG_IDF_TARGET="esp32p4"
 CONFIG_ESP32P4_REV_MIN_1_3=y
 
-# ── Flash / partitions (esp_hosted Wi-Fi stack makes the app ~1 MB) ──────────
+# ── Flash / partitions (display + LVGL push the app over the default 1 MB) ───
 CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
 CONFIG_PARTITION_TABLE_CUSTOM=y
 CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
@@ -11,13 +11,6 @@ CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
 CONFIG_SPIRAM=y
 CONFIG_SPIRAM_MODE_OCT=y
 CONFIG_SPIRAM_SPEED_200M=y
-# esp_hosted allocates its task stacks in PSRAM (TCB stays in internal RAM);
-# allow FreeRTOS task stacks in external memory or it asserts at task creation.
-CONFIG_FREERTOS_TASK_CREATE_ALLOW_EXT_MEM=y
-# Move esp_hosted + Wi-Fi/LWIP buffers to PSRAM so internal RAM isn't exhausted
-# (otherwise the FreeRTOS idle task on core 1 fails to allocate its stack).
-CONFIG_ESP_HOSTED_MEMPOOL_PREFER_SPIRAM=y
-CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP=y
 
 # ── TinyUSB (USB 2.0 PHY — NOT USJ) ─────────────────────────────────────────
 CONFIG_TINYUSB_CDC_ENABLED=y

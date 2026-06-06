@@ -128,8 +128,8 @@ class MainWindow(QMainWindow):
         tabs.addTab(UartPanel(self._conn),         "UART")
         tabs.addTab(I2cPanel(self._conn),          "I2C Sensors")
         tabs.addTab(EmmcPanel(self._conn),         "eMMC")
-        tabs.addTab(WifiPanel(self._conn),         "Wi-Fi")
-        tabs.addTab(BluetoothPanel(self._conn),    "Bluetooth")
+        tabs.addTab(WifiPanel(self._c6_conn),      "Wi-Fi")
+        tabs.addTab(BluetoothPanel(self._c6_conn), "Bluetooth")
         tabs.addTab(DisplayPanel(self._conn),      "Display")
         tabs.addTab(UsbSerialPanel(self._conn),    "USB Serial Log")
         return tabs
