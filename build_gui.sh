@@ -20,10 +20,11 @@ for arg in "$@"; do
     [ "$arg" = "--onefile" ] && ONEFILE=1
 done
 
-# Ensure PyInstaller is installed
+# Ensure PyInstaller is installed (use python -m pip so it works even if the
+# pip wrapper script is missing)
 if ! "$VENV/python" -c "import PyInstaller" 2>/dev/null; then
     echo "Installing PyInstaller..."
-    "$VENV/pip" install pyinstaller --quiet
+    "$VENV/python" -m pip install pyinstaller
 fi
 
 echo "Building GUI application..."

@@ -16,11 +16,19 @@ $VENV  = "$TOOL\.venv\Scripts"
 $DIST  = "$ROOT\dist"
 $PY    = "$VENV\python.exe"
 
-# Ensure pip and PyInstaller are available
-& $PY -m ensurepip --upgrade --quiet 2>$null
-if (-not (& $PY -c "import PyInstaller" 2>$null)) {
+# Ensure PyInstaller is available. Probe with ErrorActionPreference relaxed so a
+# missing-import (non-zero exit) does not abort the script under "Stop".
+$ErrorActionPreference = "Continue"
+& $PY -c "import PyInstaller" 2>$null
+$havePyInstaller = ($LASTEXITCODE -eq 0)
+$ErrorActionPreference = "Stop"
+if (-not $havePyInstaller) {
     Write-Host "Installing PyInstaller..." -ForegroundColor Cyan
-    & $PY -m pip install pyinstaller --quiet
+    & $PY -m pip install pyinstaller
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Failed to install PyInstaller." -ForegroundColor Red
+        exit 1
+    }
 }
 
 Write-Host "Building GUI executable..." -ForegroundColor Cyan
@@ -28,6 +36,9 @@ Set-Location $TOOL
 
 $mode = if ($OneDir) { "--onedir" } else { "--onefile" }
 
+# PyInstaller writes its normal progress to stderr; relax ErrorActionPreference
+# so that does not abort the script under "Stop". Check the exit code instead.
+$ErrorActionPreference = "Continue"
 & $PY -m PyInstaller main.py `
     $mode `
     --windowed `
@@ -37,8 +48,10 @@ $mode = if ($OneDir) { "--onedir" } else { "--onefile" }
     --specpath "$ROOT\build_gui_tmp" `
     --clean `
     --noconfirm
+$pyiExit = $LASTEXITCODE
+$ErrorActionPreference = "Stop"
 
-if ($LASTEXITCODE -ne 0) {
+if ($pyiExit -ne 0) {
     Write-Host "PyInstaller failed." -ForegroundColor Red
     exit 1
 }

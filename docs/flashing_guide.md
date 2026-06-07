@@ -1,113 +1,143 @@
-# Flashing Guide — ESP32-P4C6 Demo Firmware
+# Flashing Guide
+
+There are **two** firmwares: the ESP32-P4 app (`firmware/`) and the ESP32-C6
+Wi-Fi/BLE app (`firmware_c6/`). They are flashed over **different** USB serial
+ports. The easiest path is the build scripts; the manual `idf.py` path is below for
+reference.
+
+| Firmware | Project dir | Target | Flash port (example) |
+|----------|-------------|--------|----------------------|
+| ESP32-P4 app | `firmware/` | `esp32p4` | USB-Serial/JTAG, `303A:1001`, e.g. COM5 |
+| ESP32-C6 Wi-Fi/BLE | `firmware_c6/` | `esp32c6` | CH340, `1A86:7523`, e.g. COM4 |
+
+See the [README port table](../README.md#identifying-the-com-ports) for how to find
+these on your PC.
+
+---
 
 ## Prerequisites
 
 | Tool | Version | Install |
 |------|---------|---------|
-| ESP-IDF | ≥ 5.3.0 | [docs.espressif.com/get-started](https://docs.espressif.com/projects/esp-idf/en/stable/esp32p4/get-started/) |
-| Python | ≥ 3.9 | via ESP-IDF installer |
-| esptool.py | bundled with IDF | — |
+| ESP-IDF | **5.4.1** | `./setup.ps1` / `./setup.sh`, or [Espressif get-started](https://docs.espressif.com/projects/esp-idf/en/v5.4.1/esp32p4/get-started/) |
+| Python | ≥ 3.9 | bundled with ESP-IDF |
+| esptool | bundled with IDF | — |
 
 ---
 
-## 1. Clone / copy the firmware project
+## Option A — build scripts (recommended)
 
-The firmware lives in `firmware/` inside this repository.
-
+### Flash both chips at once
+**Windows**
+```powershell
+.\build_firmware.ps1 -Target both -Flash -Port COM5 -C6Port COM4
 ```
-ESP32-P4C6 Demo Environment/
-└── firmware/          ← this is the ESP-IDF project root
-```
-
----
-
-## 2. Set the target chip
-
+**macOS / Linux**
 ```bash
-idf.py set-target esp32p4
+./build_firmware.sh --target both --flash \
+    --port /dev/tty.usbmodemXXXX --c6-port /dev/tty.usbserialXXXX
 ```
 
-Open `sdkconfig` (or run `idf.py menuconfig`) and set:
+### Flash one chip
+```powershell
+.\build_firmware.ps1 -Target p4 -Flash -Port COM5     # P4 only
+.\build_firmware.ps1 -Target c6 -Flash -C6Port COM4   # C6 only
+```
+```bash
+./build_firmware.sh --target p4 --flash --port <p4-port>
+./build_firmware.sh --target c6 --flash --c6-port <c6-port>
+```
 
-- **Component config → ESP32P4-specific → Chip revision** → `v1.3`
+### Build without flashing
+Drop `-Flash` / `--flash`. Add `-Monitor` / `--monitor` to open a serial monitor
+after flashing.
+
+> **After flashing, power-cycle the board** (unplug/replug) so both chips boot
+> cleanly. See [troubleshooting](troubleshooting.md) for why this matters for the C6.
 
 ---
 
-## 3. Install managed components
+## Option B — manual `idf.py`
 
-On first build, IDF downloads the managed components listed in `idf_component.yml`:
-
+First make the IDF environment available in your shell:
 ```bash
+# macOS/Linux
+. ~/.espressif/v5.4.1/esp-idf/export.sh
+# Windows: run the "ESP-IDF 5.4.1 PowerShell" shortcut, or
+#   & C:\Espressif\v5.4.1\esp-idf\export.ps1   (may require the Espressif env vars)
+```
+
+### ESP32-P4 app
+```bash
+cd firmware
+idf.py set-target esp32p4        # first time only
 idf.py build
+idf.py -p <p4-port> flash monitor
 ```
 
-This automatically fetches:
-- `espressif/esp_lcd_co5300`
-- `lvgl/lvgl`
-- `espressif/esp_lvgl_port`
+### ESP32-C6 Wi-Fi/BLE
+```bash
+cd firmware_c6
+idf.py set-target esp32c6        # first time only (target is also in sdkconfig.defaults)
+idf.py build
+idf.py -p <c6-port> flash
+```
+
+On the first build, IDF downloads the managed components declared in
+`idf_component.yml` (LVGL, `esp_lcd_co5300`, `esp_tinyusb`, …). This is automatic
+and happens once.
 
 ---
 
-## 4. Flash
+## Option C — external USB-UART adapter (boards that won't enter download mode)
 
-### Option A — USB 2.0 PHY (recommended, works on all boards)
+Some board variants have eFuse quirks that block the built-in download path. Use a
+CP2102/CH340 adapter on the P4's UART0:
 
-Connect the board's **USB-C** port (the one going through the USB hub / CH340G
-path, **not** the direct-to-ESP32-P4 port).  A `ttyACM*` / `COMx` device
-appears.
+| Adapter | ESP32-P4 |
+|---------|----------|
+| TX | GPIO 38 (RX) |
+| RX | GPIO 37 (TX) |
+| GND | GND |
 
-```bash
-idf.py -p /dev/ttyACM0 flash monitor
-# Windows:
-idf.py -p COM3 flash monitor
-```
-
-### Option B — External USB-UART adapter (required for Board #5 which has a burned eFuse)
-
-Wire your CP2102 / CH340 adapter:
-
-| Adapter | ESP32-P4 board |
-|---------|----------------|
-| TX      | GPIO 38 (RX)   |
-| RX      | GPIO 37 (TX)   |
-| GND     | GND            |
-
-Put the board into **bootloader mode**:
-1. Hold the **BOOT** button
-2. Press and release **EN/RESET**
-3. Release **BOOT**
+Enter bootloader mode manually:
+1. Hold **BOOT**.
+2. Press and release **EN/RESET**.
+3. Release **BOOT**.
 
 Flash:
 ```bash
-idf.py -p /dev/ttyUSB0 --before default_reset --after no_reset flash
+idf.py -p <adapter-port> --before default_reset --after no_reset flash
 ```
 
 ---
 
-## 5. Verify
+## Verifying a successful flash
 
-After flashing, open a serial monitor at **115200 baud** on UART0 (`GPIO37/38`).
-You should see:
-
+### ESP32-P4
+Open its USB-Serial/JTAG port (`303A:1001`) at 115200:
 ```
-I (xxx) main: ESP32-P4C6 Demo Firmware v1.0.0 starting...
-I (xxx) gpio_module: GPIO module ready ...
-I (xxx) uart_module: UART1 ready ...
-...
-I (xxx) main: Ready. Listening for JSON commands on USB CDC.
+I (...) main: ESP32-P4C6 Demo Firmware v1.0.0 starting...
+I (...) gpio_module: GPIO module ready (free: 16-19, ign: GPIO27, ilum: GPIO26)
+I (...) uart_module: UART1 ready (RX=GPIO5 TX=GPIO4 @115200 baud)
+I (...) main: Ready. Listening for JSON commands on USB CDC.
 ```
+The JSON protocol itself is served on the **TinyUSB CDC** port (`303A:4001`).
 
-The JSON protocol is served on the **USB CDC** port (the `ttyACM*` / `COMx`
-that appears when the board's USB-C connects through the USB hub).
+### ESP32-C6
+Open its CH340 port (`1A86:7523`) at 115200. Shortly after reset you should see
+Wi-Fi calibration logs (`wifi: ...`) and the co-processor banner. (The protocol the
+P4 uses runs on the C6's UART1, not on this CH340 log port.)
 
 ---
 
-## 6. Wi-Fi (optional)
+## Flash layout (both chips)
 
-Wi-Fi requires the ESP32-C6 to run the ESP-Hosted slave firmware:
+`partitions.csv` — 4 MB flash, single 3 MB app partition (the Wi-Fi+BLE binary on
+the C6 and the LVGL+display binary on the P4 both need the room):
 
-1. Flash `esp-hosted/slave/` to the ESP32-C6 (via the CH340G port on the hub).
-2. Uncomment `CONFIG_ESP_HOSTED_ENABLED=y` in `sdkconfig.defaults`.
-3. Re-build and re-flash the ESP32-P4 firmware.
-
-See `docs/modules/wifi.md` for SDIO pin mapping details.
+```
+nvs       data nvs     0x9000  0x6000
+phy_init  data phy     0xf000  0x1000
+factory   app  factory 0x10000 0x300000
+```

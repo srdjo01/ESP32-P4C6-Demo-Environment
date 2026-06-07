@@ -99,6 +99,8 @@ int display_module_init(void)
 {
     esp_err_t ret;
 
+    if (s_init) return 0;   /* idempotent — safe to call from on-demand handlers */
+
     /* Enable LDO channel 3 for display power. */
     esp_ldo_channel_config_t ldo_cfg = {
         .chan_id    = DISP_LDO_CHANNEL,

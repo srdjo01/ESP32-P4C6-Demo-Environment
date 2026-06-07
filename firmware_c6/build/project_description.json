@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "esp32c6_wifi_bt",
-    "project_version":    "81348dd-dirty",
+    "project_version":    "3d45ce5-dirty",
     "project_path":       "C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware_c6",
     "idf_path":           "C:/Espressif/v5.4.1/esp-idf",
     "build_dir":          "C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware_c6/build",

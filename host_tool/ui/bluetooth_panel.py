@@ -4,7 +4,8 @@ bluetooth_panel.py — BLE scan panel (ESP32-C6)
 Bluetooth is provided by the ESP32-C6 co-processor. This panel runs a passive
 BLE scan and lists nearby devices with their signal strength (RSSI).
 
-It talks to the C6 over its own serial port (CH340G), separate from the P4.
+The P4 proxies the scan command to the C6 over a direct UART link, so this panel
+uses the normal P4 connection.
 """
 
 from __future__ import annotations
@@ -52,10 +53,13 @@ class BluetoothPanel(QWidget):
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         info = QLabel(
-            "Bluetooth (BLE) is provided by the ESP32-C6 co-processor.\n"
-            "Connect to the C6 serial port (CH340G) using the 'C6 port' selector "
-            "in the top bar, then scan for nearby BLE devices.\n"
-            "Signal strength (RSSI) is colour-coded: green = strong, red = weak."
+            "Bluetooth (BLE) is provided by the on-board ESP32-C6 co-processor.\n"
+            "The host talks only to the ESP32-P4 (COM port in the top bar); the P4 "
+            "forwards the scan to the C6 over the direct inter-chip UART link "
+            "(P4 GPIO15/14 ↔ C6 GPIO21/20).\n"
+            "Connect to the P4, then run a 3-second passive scan for nearby BLE "
+            "devices. Signal strength (RSSI) is colour-coded: green = strong, "
+            "yellow = medium, red = weak."
         )
         info.setWordWrap(True)
         layout.addWidget(info)
@@ -88,19 +92,25 @@ class BluetoothPanel(QWidget):
 
     def _do_scan(self):
         if not self._conn.is_connected:
-            self._count_label.setText("C6 not connected")
+            self._count_label.setText("Not connected")
+            self._count_label.setStyleSheet("color: #e74c3c;")
             return
         self._progress.setVisible(True)
-        self._count_label.setText("Scanning…")
+        self._count_label.setText("Scanning… (3 s)")
+        self._count_label.setStyleSheet("")
         self._worker = _Worker(self._conn, cmd_ble_scan(), timeout=10.0)
         self._worker.finished.connect(self._on_result)
         self._worker.start()
 
     def _on_result(self, resp: dict):
         self._progress.setVisible(False)
-        if not resp or resp.get("status") != "ok":
-            msg = resp.get("message", "scan failed") if resp else "no response"
-            self._count_label.setText(f"Error: {msg}")
+        if not resp:
+            self._count_label.setText("No response — is the ESP32-C6 powered/flashed?")
+            self._count_label.setStyleSheet("color: #e74c3c;")
+            return
+        if resp.get("status") != "ok":
+            self._count_label.setText("Error: " + resp.get("message", "scan failed"))
+            self._count_label.setStyleSheet("color: #e74c3c;")
             return
 
         devices = resp.get("devices", [])
@@ -121,3 +131,4 @@ class BluetoothPanel(QWidget):
             self._table.setItem(row, 2, rssi_item)
 
         self._count_label.setText(f"{len(devices)} device(s) found")
+        self._count_label.setStyleSheet("color: #2ecc71;")

@@ -3,11 +3,17 @@
  * ==========================================
  *
  * The ESP32-P4 has no radio; the on-board ESP32-C6 provides Wi-Fi and BLE.
- * This firmware exposes those radios to the host PC over UART0 (routed to the
- * board's CH340G → a COM port) using the same newline-delimited JSON protocol
- * as the ESP32-P4 firmware, so the host tool can talk to both with one parser.
+ * This firmware exposes those radios to the ESP32-P4 *directly* over a UART
+ * running on the inter-chip SDIO wires (used here as a plain UART, not SDIO):
  *
- * Commands (host → C6):
+ *     C6 GPIO20 (TX) ── P4 GPIO14 (RX)      [SDIO D0 wire]
+ *     C6 GPIO21 (RX) ── P4 GPIO15 (TX)      [SDIO D1 wire]
+ *
+ * The same newline-delimited JSON protocol as the ESP32-P4 firmware is used, so
+ * the P4 can proxy these commands. UART0 stays wired to the CH340G and is used
+ * only for console logs (the host PC no longer drives the protocol directly).
+ *
+ * Commands (P4 → C6):
  *   {"cmd":"ping"}
  *   {"cmd":"wifi_scan"}
  *   {"cmd":"wifi_connect","ssid":"...","password":"..."}
@@ -43,7 +49,13 @@ static const char *TAG = "c6_main";
 
 /* ── UART protocol ───────────────────────────────────────────────────────── */
 
-#define PROTO_UART      UART_NUM_0
+/*
+ * Protocol link to the ESP32-P4 over the inter-chip SDIO wires (plain UART).
+ * UART0 is left on the CH340G for console logging.
+ */
+#define PROTO_UART      UART_NUM_1
+#define PROTO_TX_GPIO   20   /* → P4 GPIO14 (RX)  [SDIO D0 wire] */
+#define PROTO_RX_GPIO   21   /* ← P4 GPIO15 (TX)  [SDIO D1 wire] */
 #define PROTO_BAUD      115200
 #define LINE_MAX        512
 #define RESP_MAX        2048
@@ -374,7 +386,8 @@ void app_main(void)
         nvs_flash_init();
     }
 
-    /* UART driver for the JSON protocol (UART0 is already wired to CH340). */
+    /* UART driver for the JSON protocol, on the inter-chip wires to the P4.
+     * UART0 stays on the CH340G for console logs. */
     uart_config_t uc = {
         .baud_rate = PROTO_BAUD,
         .data_bits = UART_DATA_8_BITS,
@@ -385,6 +398,8 @@ void app_main(void)
     };
     uart_driver_install(PROTO_UART, 2048, 0, 0, NULL, 0);
     uart_param_config(PROTO_UART, &uc);
+    uart_set_pin(PROTO_UART, PROTO_TX_GPIO, PROTO_RX_GPIO,
+                 UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 
     wifi_init();
 

@@ -72,7 +72,9 @@ if (-not (Test-Path "$VENV\Scripts\python.exe")) {
 }
 
 Write-Host "  Installing GUI dependencies..."
-& "$VENV\Scripts\python.exe" -m ensurepip --upgrade --quiet 2>$null
+# Note: `python -m venv` already provides pip, so ensurepip is not needed (and
+# `ensurepip --quiet` is invalid and would abort under ErrorActionPreference=Stop).
+& "$VENV\Scripts\python.exe" -m pip install --upgrade pip --quiet
 & "$VENV\Scripts\python.exe" -m pip install -r "$ROOT\host_tool\requirements.txt" --quiet
 & "$VENV\Scripts\python.exe" -m pip install pyinstaller --quiet
 Write-OK "GUI venv ready at host_tool\.venv"

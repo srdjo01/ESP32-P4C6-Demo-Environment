@@ -15,7 +15,12 @@ CONFIG_SPIRAM_SPEED_200M=y
 # ── TinyUSB (USB 2.0 PHY — NOT USJ) ─────────────────────────────────────────
 CONFIG_TINYUSB_CDC_ENABLED=y
 CONFIG_TINYUSB_CDC_RX_BUFSIZE=512
-CONFIG_TINYUSB_CDC_TX_BUFSIZE=512
+# TX buffer holds a full response in one shot (PROTO_RESP_MAX); proto_send also
+# chunks anything larger. 512 truncated big wifi_scan responses.
+CONFIG_TINYUSB_CDC_TX_BUFSIZE=1024
+# Protocol commands are dispatched in the TinyUSB task; the Wi-Fi path (C6 proxy
+# + cJSON) needs more than the 4 KB default.
+CONFIG_TINYUSB_TASK_STACK_SIZE=8192
 CONFIG_TINYUSB_DESC_MANUFACTURER_STRING="ESP32-P4C6 Demo"
 CONFIG_TINYUSB_DESC_PRODUCT_STRING="ESP32-P4C6 Demo Board"
 CONFIG_TINYUSB_DESC_SERIAL_STRING="P4C6-001"

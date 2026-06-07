@@ -92,13 +92,14 @@ static void init_modules_hw(void *arg)
 
     ESP_LOGI(TAG, "Initialising Wi-Fi module...");
     if (wifi_module_init() != 0) {
-        ESP_LOGW(TAG, "Wi-Fi module init failed — ESP-Hosted may not be configured");
+        ESP_LOGW(TAG, "Wi-Fi module init failed — C6 not responding on UART link");
     }
 
-    ESP_LOGI(TAG, "Initialising Display module...");
-    if (display_module_init() != 0) {
-        ESP_LOGW(TAG, "Display module init failed — check panel/FPC connection");
-    }
+    /* Display init is deferred: the CO5300 panel_init busy-waits forever on the
+     * MIPI-DSI read FIFO when no panel (or a mis-seated FPC) is present, which
+     * pins CPU0 and starves the rest of the system. It is now initialised
+     * on-demand by the first display_* command instead (see protocol.c). */
+    ESP_LOGI(TAG, "Display module init deferred to first display command");
 
     proto_send("{\"event\":\"hw_ready\",\"i2c\":1,\"emmc\":1}");
     vTaskDelete(NULL);

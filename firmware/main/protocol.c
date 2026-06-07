@@ -22,12 +22,36 @@ static const char *TAG = "proto";
 
 /* ── CDC send helper ───────────────────────────────────────────────────── */
 
+/*
+ * Send a full line over CDC. The CDC TX ring buffer is finite
+ * (CONFIG_TINYUSB_CDC_TX_BUFSIZE), and tinyusb_cdcacm_write_queue() only queues
+ * what currently fits — extra bytes are silently dropped. Large responses
+ * (e.g. wifi_scan with many APs) therefore get truncated unless we flush and
+ * keep writing the remainder. Loop until the whole string + newline are sent.
+ */
+static void cdc_write_all(const uint8_t *data, size_t len)
+{
+    size_t off = 0;
+    int stalls = 0;
+    while (off < len) {
+        size_t n = tinyusb_cdcacm_write_queue(TINYUSB_CDC_ACM_0, data + off, len - off);
+        off += n;
+        if (off < len) {
+            /* buffer full — flush to make room, then continue */
+            tinyusb_cdcacm_write_flush(TINYUSB_CDC_ACM_0, pdMS_TO_TICKS(100));
+            /* guard against a host that stopped reading: bail after ~2 s */
+            if (n == 0 && ++stalls > 20) break;
+        } else {
+            stalls = 0;
+        }
+    }
+}
+
 void proto_send(const char *json_str)
 {
-    size_t len = strlen(json_str);
-    tinyusb_cdcacm_write_queue(TINYUSB_CDC_ACM_0, (const uint8_t *)json_str, len);
-    tinyusb_cdcacm_write_queue(TINYUSB_CDC_ACM_0, (const uint8_t *)"\n", 1);
-    tinyusb_cdcacm_write_flush(TINYUSB_CDC_ACM_0, 0);
+    cdc_write_all((const uint8_t *)json_str, strlen(json_str));
+    cdc_write_all((const uint8_t *)"\n", 1);
+    tinyusb_cdcacm_write_flush(TINYUSB_CDC_ACM_0, pdMS_TO_TICKS(100));
 }
 
 void proto_send_error(const char *cmd, const char *message)
@@ -372,10 +396,34 @@ static void handle_wifi_ping(cJSON *root)
     proto_send(resp);
 }
 
+static void handle_ble_scan(void)
+{
+    ble_scan_result_t devices[20];
+    int count = 0;
+    if (wifi_module_ble_scan(devices, 20, &count) != 0) {
+        proto_send_error("ble_scan", "scan failed — check C6 link");
+        return;
+    }
+
+    char resp[PROTO_RESP_MAX];
+    int off = snprintf(resp, sizeof(resp),
+                       "{\"status\":\"ok\",\"cmd\":\"ble_scan\",\"devices\":[");
+    for (int i = 0; i < count && off < (int)sizeof(resp) - 80; i++) {
+        if (i > 0) off += snprintf(resp + off, sizeof(resp) - off, ",");
+        off += snprintf(resp + off, sizeof(resp) - off,
+                        "{\"name\":\"%s\",\"addr\":\"%s\",\"rssi\":%d}",
+                        devices[i].name, devices[i].addr, devices[i].rssi);
+    }
+    off += snprintf(resp + off, sizeof(resp) - off, "]}");
+    proto_send(resp);
+}
+
+/* Display is initialised on demand (deferred from boot — see app_main.c). */
 static void handle_display_pattern(void)
 {
+    display_module_init();   /* idempotent; brings the panel up on first use */
     if (display_module_show_pattern() != 0) {
-        proto_send_error("display_pattern", "display not initialized");
+        proto_send_error("display_pattern", "display init failed (panel/FPC?)");
         return;
     }
     proto_send("{\"status\":\"ok\",\"cmd\":\"display_pattern\"}");
@@ -388,8 +436,9 @@ static void handle_display_text(cJSON *root)
         proto_send_error("display_text", "missing text");
         return;
     }
+    display_module_init();
     if (display_module_show_text(jtext->valuestring) != 0) {
-        proto_send_error("display_text", "display not initialized");
+        proto_send_error("display_text", "display init failed (panel/FPC?)");
         return;
     }
     proto_send("{\"status\":\"ok\",\"cmd\":\"display_text\"}");
@@ -397,6 +446,7 @@ static void handle_display_text(cJSON *root)
 
 static void handle_display_clear(void)
 {
+    display_module_init();
     display_module_clear();
     proto_send("{\"status\":\"ok\",\"cmd\":\"display_clear\"}");
 }
@@ -434,6 +484,7 @@ void proto_dispatch(const char *line, size_t len)
     else if (strcmp(cmd, "wifi_connect")     == 0) handle_wifi_connect(root);
     else if (strcmp(cmd, "wifi_disconnect")  == 0) handle_wifi_disconnect();
     else if (strcmp(cmd, "wifi_ping")        == 0) handle_wifi_ping(root);
+    else if (strcmp(cmd, "ble_scan")         == 0) handle_ble_scan();
     else if (strcmp(cmd, "display_pattern")  == 0) handle_display_pattern();
     else if (strcmp(cmd, "display_text")     == 0) handle_display_text(root);
     else if (strcmp(cmd, "display_clear")    == 0) handle_display_clear();

@@ -405,6 +405,10 @@
    'C:\\Users\\srdjan\\Desktop\\ESP32-P4C6 Demo Environment\\ESP32-P4C6 Demo '
    'Environment\\host_tool\\ui\\__init__.py',
    'PYMODULE'),
+  ('ui.bluetooth_panel',
+   'C:\\Users\\srdjan\\Desktop\\ESP32-P4C6 Demo Environment\\ESP32-P4C6 Demo '
+   'Environment\\host_tool\\ui\\bluetooth_panel.py',
+   'PYMODULE'),
   ('ui.display_panel',
    'C:\\Users\\srdjan\\Desktop\\ESP32-P4C6 Demo Environment\\ESP32-P4C6 Demo '
    'Environment\\host_tool\\ui\\display_panel.py',

@@ -8,9 +8,12 @@ Manages two distinct GPIO groups:
 
 | Group | Pins | Direction | Purpose |
 |-------|------|-----------|---------|
-| Free GPIO | 14, 15, 16, 17, 18, 19 | Output (readable) | General-purpose host-controlled I/O |
+| Free GPIO | 16, 17, 18, 19 | Output (readable) | General-purpose host-controlled I/O |
 | Illumination | GPIO 26 | Input (pull-down) | 12/24 V digital input via level-shifter |
 | Ignition | GPIO 27 | Input (pull-down) | 12/24 V digital input via level-shifter |
+
+> GPIO14/15 were previously in the free set but are now reserved for the
+> **ESP32-C6 UART link** (P4 TX=15, RX=14). See `docs/modules/wifi_bt.md`.
 
 ## Initialisation
 

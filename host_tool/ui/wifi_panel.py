@@ -1,8 +1,8 @@
 """
 wifi_panel.py — Wi-Fi panel (scan, connect, ping)
 
-Wi-Fi is provided by the ESP32-C6 co-processor via ESP-Hosted (SDIO).
-If ESP-Hosted is not configured, the board will report errors.
+Wi-Fi is provided by the ESP32-C6 co-processor. The P4 proxies these commands
+to the C6 over a direct UART link, so this panel uses the normal P4 connection.
 """
 
 from __future__ import annotations
@@ -41,9 +41,9 @@ class WifiPanel(QWidget):
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         info = QLabel(
-            "Wi-Fi is provided by the ESP32-C6 co-processor running the custom\n"
-            "Wi-Fi/BLE firmware. Connect to the C6 serial port (CH340G) using the\n"
-            "'C6 port' selector in the top bar, then scan / connect / ping below."
+            "Wi-Fi is provided by the ESP32-C6 co-processor. The P4 forwards these\n"
+            "commands to the C6 over a direct UART link, so just connect to the P4\n"
+            "in the top bar, then scan / connect / ping below."
         )
         info.setWordWrap(True)
         layout.addWidget(info)
@@ -56,9 +56,14 @@ class WifiPanel(QWidget):
         # ── Scan ──
         scan_box = QGroupBox("Network scan")
         scan_layout = QVBoxLayout(scan_box)
+        scan_ctrl = QHBoxLayout()
         btn_scan = QPushButton("Scan for networks")
         btn_scan.clicked.connect(self._do_scan)
-        scan_layout.addWidget(btn_scan)
+        scan_ctrl.addWidget(btn_scan)
+        self._scan_status = QLabel("")
+        scan_ctrl.addWidget(self._scan_status)
+        scan_ctrl.addStretch()
+        scan_layout.addLayout(scan_ctrl)
         self._scan_table = QTableWidget(0, 3)
         self._scan_table.setHorizontalHeaderLabels(["SSID", "RSSI (dBm)", "Auth"])
         self._scan_table.horizontalHeader().setSectionResizeMode(
@@ -66,6 +71,7 @@ class WifiPanel(QWidget):
         )
         self._scan_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self._scan_table.setMaximumHeight(200)
+        self._scan_table.cellDoubleClicked.connect(self._pick_ssid)
         scan_layout.addWidget(self._scan_table)
         layout.addWidget(scan_box)
 
@@ -116,15 +122,25 @@ class WifiPanel(QWidget):
 
     def _do_scan(self):
         if not self._conn.is_connected:
+            self._scan_status.setText("Not connected")
+            self._scan_status.setStyleSheet("color: #e74c3c;")
             return
         self._busy(True)
+        self._scan_status.setText("Scanning…")
+        self._scan_status.setStyleSheet("")
         self._worker = _Worker(self._conn, cmd_wifi_scan(), timeout=15.0)
         self._worker.finished.connect(self._on_scan_result)
         self._worker.start()
 
     def _on_scan_result(self, resp: dict):
         self._busy(False)
-        if not resp or resp.get("status") != "ok":
+        if not resp:
+            self._scan_status.setText("No response — is the ESP32-C6 powered/flashed?")
+            self._scan_status.setStyleSheet("color: #e74c3c;")
+            return
+        if resp.get("status") != "ok":
+            self._scan_status.setText("Error: " + resp.get("message", "scan failed"))
+            self._scan_status.setStyleSheet("color: #e74c3c;")
             return
         networks = resp.get("networks", [])
         self._scan_table.setRowCount(0)
@@ -134,8 +150,8 @@ class WifiPanel(QWidget):
             self._scan_table.setItem(row, 0, QTableWidgetItem(net.get("ssid", "")))
             self._scan_table.setItem(row, 1, QTableWidgetItem(str(net.get("rssi", 0))))
             self._scan_table.setItem(row, 2, QTableWidgetItem(net.get("auth", "")))
-        # Allow double-click to fill SSID field
-        self._scan_table.cellDoubleClicked.connect(self._pick_ssid)
+        self._scan_status.setText(f"{len(networks)} network(s) found")
+        self._scan_status.setStyleSheet("color: #2ecc71;")
 
     def _pick_ssid(self, row: int, _col: int):
         item = self._scan_table.item(row, 0)

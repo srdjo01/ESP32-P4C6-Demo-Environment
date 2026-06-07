@@ -5,8 +5,10 @@
 
 static const char *TAG = "gpio_module";
 
-/* Free GPIO pins available for host control. */
-static const int FREE_GPIO[] = { 14, 15, 16, 17, 18, 19 };
+/* Free GPIO pins available for host control.
+ * GPIO14/15 are reserved for the ESP32-C6 UART link (see wifi_module), so the
+ * general-purpose set is 16-19. */
+static const int FREE_GPIO[] = { 16, 17, 18, 19 };
 #define FREE_GPIO_COUNT (sizeof(FREE_GPIO) / sizeof(FREE_GPIO[0]))
 
 #define PIN_ILLUMINATION 26
@@ -48,7 +50,7 @@ void gpio_module_init(void)
     gpio_config(&in_cfg);
 
     s_init = true;
-    ESP_LOGI(TAG, "GPIO module ready (free: 14-19, ign: GPIO27, ilum: GPIO26)");
+    ESP_LOGI(TAG, "GPIO module ready (free: 16-19, ign: GPIO27, ilum: GPIO26)");
 }
 
 int gpio_module_set(int pin, int level)

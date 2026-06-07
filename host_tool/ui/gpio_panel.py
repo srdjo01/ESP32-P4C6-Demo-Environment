@@ -1,8 +1,12 @@
 """
-gpio_panel.py — Free GPIO control panel (GPIO 14–19)
+gpio_panel.py — Free GPIO control panel (GPIO 16–19)
 
 Each pin has a "Set HIGH" / "Set LOW" button pair and a live state indicator
 that is updated whenever the user reads the pin.
+
+GPIO 14 and 15 are intentionally excluded: they carry the direct UART link to
+the ESP32-C6 (Wi-Fi/BLE), so the firmware reserves them and rejects gpio_*
+commands for those pins.
 """
 
 from __future__ import annotations
@@ -14,7 +18,9 @@ from PyQt6.QtCore import Qt
 from protocol.commands import cmd_gpio_set, cmd_gpio_get
 
 
-FREE_GPIO_PINS = [14, 15, 16, 17, 18, 19]
+# GPIO 14/15 carry the ESP32-C6 UART link, so only 16–19 are free for testing
+# (must match FREE_GPIO[] in firmware/components/gpio_module/gpio_module.c).
+FREE_GPIO_PINS = [16, 17, 18, 19]
 
 
 class GpioPanel(QWidget):
@@ -29,9 +35,10 @@ class GpioPanel(QWidget):
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         info = QLabel(
-            "Drive and read the six free GPIO pins (14–19).\n"
+            "Drive and read the free GPIO pins (16–19).\n"
             "These pins are configured as push-pull outputs; "
-            "use 'Read' to sample their current level."
+            "use 'Read' to sample their current level.\n"
+            "(GPIO 14/15 are reserved for the ESP32-C6 Wi-Fi/BLE UART link.)"
         )
         info.setWordWrap(True)
         layout.addWidget(info)
