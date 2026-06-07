@@ -93,6 +93,36 @@ static void create_text_screen(void)
     lv_label_set_text(s_label_text, "");
 }
 
+/* ── Panel presence probe ──────────────────────────────────────────────────
+ *
+ * The CO5300's panel_init busy-waits on the MIPI-DSI read FIFO; with no panel
+ * (or a mis-seated FPC) that wait never returns, which pins the CPU until the
+ * watchdog reboots the board (and drops the USB CDC link — the host GUI then
+ * sees the board vanish, i.e. "crash"). There is no read-back on the DSI panel
+ * itself, so we detect the display board via its CST820B touch controller,
+ * which sits on the same FPC/adapter (I2C_NUM_1, addr 0x15). If the touch
+ * controller does not ACK, no display is attached: bail out cleanly instead of
+ * entering the hanging panel_init. */
+static bool display_panel_present(void)
+{
+    i2c_master_bus_config_t bus_cfg = {
+        .i2c_port                     = TOUCH_I2C_PORT,
+        .sda_io_num                   = TOUCH_SDA_GPIO,
+        .scl_io_num                   = TOUCH_SCL_GPIO,
+        .clk_source                   = I2C_CLK_SRC_DEFAULT,
+        .glitch_ignore_cnt            = 7,
+        .flags.enable_internal_pullup = true,
+    };
+    i2c_master_bus_handle_t bus = NULL;
+    if (i2c_new_master_bus(&bus_cfg, &bus) != ESP_OK) {
+        ESP_LOGW(TAG, "touch-bus probe setup failed — assuming no display");
+        return false;
+    }
+    esp_err_t probe = i2c_master_probe(bus, TOUCH_I2C_ADDR, 100);
+    i2c_del_master_bus(bus);
+    return probe == ESP_OK;
+}
+
 /* ── Public API ──────────────────────────────────────────────────────────── */
 
 int display_module_init(void)
@@ -100,6 +130,13 @@ int display_module_init(void)
     esp_err_t ret;
 
     if (s_init) return 0;   /* idempotent — safe to call from on-demand handlers */
+
+    /* Cheap, non-blocking presence check before the hang-prone panel init. */
+    if (!display_panel_present()) {
+        ESP_LOGW(TAG, "No display detected (CST820B touch did not ACK) — "
+                      "skipping panel init, board stays responsive");
+        return -1;
+    }
 
     /* Enable LDO channel 3 for display power. */
     esp_ldo_channel_config_t ldo_cfg = {

@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "esp32p4c6_demo",
-    "project_version":    "3d45ce5-dirty",
+    "project_version":    "124f68b-dirty",
     "project_path":       "C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware",
     "idf_path":           "C:/Espressif/v5.4.1/esp-idf",
     "build_dir":          "C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build",

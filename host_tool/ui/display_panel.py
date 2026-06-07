@@ -74,9 +74,8 @@ class DisplayPanel(QWidget):
             self._status.setText("✓  Test pattern displayed")
             self._status.setStyleSheet("color: green;")
         else:
-            msg = resp.get("message", "no response") if resp else "no response"
-            self._status.setText(f"✗  {msg}")
-            self._status.setStyleSheet("color: red;")
+            self._status.setText("⚠  Display not connected")
+            self._status.setStyleSheet("color: #e67e22;")
 
     def _do_text(self):
         if not self._conn.is_connected:
@@ -89,13 +88,16 @@ class DisplayPanel(QWidget):
             self._status.setText(f'✓  Displaying: "{text[:40]}"')
             self._status.setStyleSheet("color: green;")
         else:
-            msg = resp.get("message", "no response") if resp else "no response"
-            self._status.setText(f"✗  {msg}")
-            self._status.setStyleSheet("color: red;")
+            self._status.setText("⚠  Display not connected")
+            self._status.setStyleSheet("color: #e67e22;")
 
     def _do_clear(self):
         if not self._conn.is_connected:
             return
-        self._conn.send_command(cmd_display_clear())
-        self._status.setText("Display cleared")
-        self._status.setStyleSheet("")
+        resp = self._conn.send_command(cmd_display_clear())
+        if resp and resp.get("status") == "ok":
+            self._status.setText("Display cleared")
+            self._status.setStyleSheet("")
+        else:
+            self._status.setText("⚠  Display not connected")
+            self._status.setStyleSheet("color: #e67e22;")

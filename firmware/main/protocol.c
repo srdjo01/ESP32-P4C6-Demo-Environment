@@ -423,7 +423,7 @@ static void handle_display_pattern(void)
 {
     display_module_init();   /* idempotent; brings the panel up on first use */
     if (display_module_show_pattern() != 0) {
-        proto_send_error("display_pattern", "display init failed (panel/FPC?)");
+        proto_send_error("display_pattern", "display not connected");
         return;
     }
     proto_send("{\"status\":\"ok\",\"cmd\":\"display_pattern\"}");
@@ -438,7 +438,7 @@ static void handle_display_text(cJSON *root)
     }
     display_module_init();
     if (display_module_show_text(jtext->valuestring) != 0) {
-        proto_send_error("display_text", "display init failed (panel/FPC?)");
+        proto_send_error("display_text", "display not connected");
         return;
     }
     proto_send("{\"status\":\"ok\",\"cmd\":\"display_text\"}");
@@ -446,7 +446,10 @@ static void handle_display_text(cJSON *root)
 
 static void handle_display_clear(void)
 {
-    display_module_init();
+    if (display_module_init() != 0) {
+        proto_send_error("display_clear", "display not connected");
+        return;
+    }
     display_module_clear();
     proto_send("{\"status\":\"ok\",\"cmd\":\"display_clear\"}");
 }
