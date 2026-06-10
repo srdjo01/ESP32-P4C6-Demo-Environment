@@ -1,9 +1,9 @@
-set(CMAKE_HOST_SYSTEM "Windows-10.0.26200")
-set(CMAKE_HOST_SYSTEM_NAME "Windows")
-set(CMAKE_HOST_SYSTEM_VERSION "10.0.26200")
-set(CMAKE_HOST_SYSTEM_PROCESSOR "AMD64")
+set(CMAKE_HOST_SYSTEM "Darwin-24.5.0")
+set(CMAKE_HOST_SYSTEM_NAME "Darwin")
+set(CMAKE_HOST_SYSTEM_VERSION "24.5.0")
+set(CMAKE_HOST_SYSTEM_PROCESSOR "arm64")
 
-include("C:/Espressif/v5.4.1/esp-idf/tools/cmake/toolchain-esp32p4.cmake")
+include("/Users/milo/esp/v5.4/esp-idf/tools/cmake/toolchain-esp32p4.cmake")
 
 set(CMAKE_SYSTEM "Generic")
 set(CMAKE_SYSTEM_NAME "Generic")

@@ -1,4 +1,4 @@
-/* * Data converted from C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware_c6/build/esp-idf/mbedtls/x509_crt_bundle
+/* * Data converted from /Users/milo/jrp_demo/ESP32-P4C6-Demo-Environment/firmware_c6/build/esp-idf/mbedtls/x509_crt_bundle
  */
 .data
 #if !defined (__APPLE__) && !defined (__linux__)
@@ -4386,3 +4386,7 @@ _binary_x509_crt_bundle_end: /* for objcopy compatibility */
 .global x509_crt_bundle_length
 x509_crt_bundle_length:
 .long 69876
+
+#if defined (__linux__)
+.section .note.GNU-stack,"",@progbits
+#endif

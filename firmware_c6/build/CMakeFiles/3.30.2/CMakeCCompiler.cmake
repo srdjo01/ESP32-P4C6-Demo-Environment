@@ -1,4 +1,4 @@
-set(CMAKE_C_COMPILER "C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-gcc.exe")
+set(CMAKE_C_COMPILER "/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/bin/riscv32-esp-elf-gcc")
 set(CMAKE_C_COMPILER_ARG1 "")
 set(CMAKE_C_COMPILER_ID "GNU")
 set(CMAKE_C_COMPILER_VERSION "14.2.0")
@@ -19,15 +19,15 @@ set(CMAKE_C_SIMULATE_ID "")
 set(CMAKE_C_COMPILER_FRONTEND_VARIANT "GNU")
 set(CMAKE_C_SIMULATE_VERSION "")
 
-set(CMAKE_C_COMPILER_SYSROOT "C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/../riscv32-esp-elf/usr")
-set(CMAKE_COMPILER_SYSROOT "C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/../riscv32-esp-elf/usr")
+set(CMAKE_C_COMPILER_SYSROOT "/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/bin/../riscv32-esp-elf/usr")
+set(CMAKE_COMPILER_SYSROOT "/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/bin/../riscv32-esp-elf/usr")
 
 
-set(CMAKE_AR "C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-ar.exe")
-set(CMAKE_C_COMPILER_AR "C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-gcc-ar.exe")
-set(CMAKE_RANLIB "C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-ranlib.exe")
-set(CMAKE_C_COMPILER_RANLIB "C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-gcc-ranlib.exe")
-set(CMAKE_LINKER "C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-ld.exe")
+set(CMAKE_AR "/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/bin/riscv32-esp-elf-ar")
+set(CMAKE_C_COMPILER_AR "/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/bin/riscv32-esp-elf-gcc-ar")
+set(CMAKE_RANLIB "/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/bin/riscv32-esp-elf-ranlib")
+set(CMAKE_C_COMPILER_RANLIB "/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/bin/riscv32-esp-elf-gcc-ranlib")
+set(CMAKE_LINKER "/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/bin/riscv32-esp-elf-ld")
 set(CMAKE_LINKER_LINK "")
 set(CMAKE_LINKER_LLD "")
 set(CMAKE_C_COMPILER_LINKER "NOTFOUND")
@@ -76,7 +76,7 @@ endif()
 
 
 
-set(CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES "C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/lib/gcc/riscv32-esp-elf/14.2.0/include;C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/lib/gcc/riscv32-esp-elf/14.2.0/include-fixed;C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include")
+set(CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES "/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/lib/gcc/riscv32-esp-elf/14.2.0/include;/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/lib/gcc/riscv32-esp-elf/14.2.0/include-fixed;/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/riscv32-esp-elf/include")
 set(CMAKE_C_IMPLICIT_LINK_LIBRARIES "gcc;c;nosys;c;gcc;gcc;c;nosys")
-set(CMAKE_C_IMPLICIT_LINK_DIRECTORIES "C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/lib/gcc/riscv32-esp-elf/14.2.0/rv32imac_zicsr_zifencei/ilp32;C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/lib/rv32imac_zicsr_zifencei/ilp32;C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/lib/gcc/riscv32-esp-elf/14.2.0;C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/lib/gcc;C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/lib;C:/Espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/usr/lib")
+set(CMAKE_C_IMPLICIT_LINK_DIRECTORIES "/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/lib/gcc/riscv32-esp-elf/14.2.0/rv32imac_zicsr_zifencei/ilp32;/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/riscv32-esp-elf/lib/rv32imac_zicsr_zifencei/ilp32;/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/lib/gcc/riscv32-esp-elf/14.2.0;/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/lib/gcc;/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/riscv32-esp-elf/lib;/Users/milo/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20250730/riscv32-esp-elf/riscv32-esp-elf/usr/lib")
 set(CMAKE_C_IMPLICIT_LINK_FRAMEWORK_DIRECTORIES "")

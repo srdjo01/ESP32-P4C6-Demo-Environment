@@ -1,13 +1,13 @@
 # Target labels
  bootloader
 # Source files and their labels
-C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/CMakeFiles/bootloader
-C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/CMakeFiles/bootloader.rule
-C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/CMakeFiles/bootloader-complete.rule
-C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
-C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
-C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
-C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
-C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
-C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
-C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
+/Users/milo/jrp_demo/ESP32-P4C6-Demo-Environment/firmware/build/CMakeFiles/bootloader
+/Users/milo/jrp_demo/ESP32-P4C6-Demo-Environment/firmware/build/CMakeFiles/bootloader.rule
+/Users/milo/jrp_demo/ESP32-P4C6-Demo-Environment/firmware/build/CMakeFiles/bootloader-complete.rule
+/Users/milo/jrp_demo/ESP32-P4C6-Demo-Environment/firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+/Users/milo/jrp_demo/ESP32-P4C6-Demo-Environment/firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+/Users/milo/jrp_demo/ESP32-P4C6-Demo-Environment/firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+/Users/milo/jrp_demo/ESP32-P4C6-Demo-Environment/firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+/Users/milo/jrp_demo/ESP32-P4C6-Demo-Environment/firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+/Users/milo/jrp_demo/ESP32-P4C6-Demo-Environment/firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+/Users/milo/jrp_demo/ESP32-P4C6-Demo-Environment/firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule

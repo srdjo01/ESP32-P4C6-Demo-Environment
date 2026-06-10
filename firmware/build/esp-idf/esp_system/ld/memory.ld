@@ -11,11 +11,8 @@
  * Restrict to simple macros with numeric values, and/or #if/#endif blocks.
  */
 /*
-
  * Automatically generated file. DO NOT EDIT.
-
- * Espressif IoT Development Framework (ESP-IDF) 5.4.1 Configuration Header
-
+ * Espressif IoT Development Framework (ESP-IDF) 5.4.3 Configuration Header
  */
        
 /* List of deprecated options */
@@ -64,10 +61,12 @@ MEMORY
   /* Flash mapped constant data */
   drom_seg (R) : org = 0x40000020, len = (0x10000 << 10) - 0x20
   /* (See irom_seg for meaning of 0x20 offset in the above.) */
+  /* Used to store the deep sleep workaround code of P4 rev3.0. The reset vector will be set here before the chip enters sleep. */
+  rev3_mspi_workaround_seg(RWX) : org = 0x50108000, len = 0x0
   /**
    * lp ram memory (RWX). Persists over deep sleep. // TODO: IDF-5667
    */
-  lp_ram_seg(RW) : org = 0x50108000 + (0 + (24)), len = 0x8000 - (0 + (24))
+  lp_ram_seg(RW) : org = 0x50108000 + 0x0 + (0 + (24)), len = 0x8000 - (0 + (24)) - 0x0
   /* We reduced the size of lp_ram_seg by RESERVE_RTC_MEM value.
      It reserves the amount of LP memory that we use for this memory segment.
      This segment is intended for keeping:
@@ -76,7 +75,7 @@ MEMORY
      The aim of this is to keep data that will not be moved around and have a fixed address.
      This segment is placed at the beginning of LP RAM, as the end of LP RAM is occupied by LP ROM stack/data
   */
-  lp_reserved_seg(RW) : org = 0x50108000, len = (0 + (24))
+  lp_reserved_seg(RW) : org = 0x50108000 + 0x0, len = (0 + (24))
   /* PSRAM seg */
   extern_ram_seg(RWX) : org = 0x48000000, len = (0x10000 << 10)
 }

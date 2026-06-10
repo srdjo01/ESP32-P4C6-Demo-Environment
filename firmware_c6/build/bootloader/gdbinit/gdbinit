@@ -1,2 +1,2 @@
-source C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware_c6/build/bootloader/gdbinit/symbols
-source C:/Users/srdjan/Desktop/ESP32-P4C6 Demo Environment/ESP32-P4C6 Demo Environment/firmware_c6/build/bootloader/gdbinit/connect
+source /Users/milo/jrp_demo/ESP32-P4C6-Demo-Environment/firmware_c6/build/bootloader/gdbinit/symbols
+source /Users/milo/jrp_demo/ESP32-P4C6-Demo-Environment/firmware_c6/build/bootloader/gdbinit/connect
