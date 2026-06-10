@@ -22,6 +22,7 @@
 #include "emmc_module.h"
 #include "wifi_module.h"
 #include "display_module.h"
+#include "can_module.h"
 
 static const char *TAG = "main";
 
@@ -72,6 +73,9 @@ static void init_modules_fast(void)
 
     ESP_LOGI(TAG, "Initialising UART module...");
     uart_module_init();
+
+    ESP_LOGI(TAG, "Initialising CAN module...");
+    can_module_init();
 }
 
 /* Slow/hardware-dependent modules — called after USB is up so the board

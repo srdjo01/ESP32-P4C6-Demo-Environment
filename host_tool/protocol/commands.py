@@ -97,3 +97,42 @@ def cmd_display_text(text: str) -> dict:
 
 def cmd_display_clear() -> dict:
     return {"cmd": "display_clear"}
+
+
+# ── CAN (TJA1051 on GPIO1/2/3) ───────────────────────────────────────────────
+
+def cmd_can_start(bitrate: int = 500_000) -> dict:
+    return {"cmd": "can_start", "bitrate": bitrate}
+
+
+def cmd_can_stop() -> dict:
+    return {"cmd": "can_stop"}
+
+
+def cmd_can_silent(silent: bool) -> dict:
+    return {"cmd": "can_silent", "silent": bool(silent)}
+
+
+def cmd_can_send(can_id: int, data: bytes = b"",
+                 *, extended: bool = False, rtr: bool = False,
+                 timeout_ms: int = 100) -> dict:
+    return {
+        "cmd":        "can_send",
+        "id":         can_id,
+        "extended":   bool(extended),
+        "rtr":        bool(rtr),
+        "data_b64":   base64.b64encode(data[:8]).decode(),
+        "timeout_ms": timeout_ms,
+    }
+
+
+def cmd_can_recv(timeout_ms: int = 200) -> dict:
+    return {"cmd": "can_recv", "timeout_ms": timeout_ms}
+
+
+def cmd_can_status() -> dict:
+    return {"cmd": "can_status"}
+
+
+def cmd_can_self_test(bitrate: int = 500_000) -> dict:
+    return {"cmd": "can_self_test", "bitrate": bitrate}

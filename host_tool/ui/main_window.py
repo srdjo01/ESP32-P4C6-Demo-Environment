@@ -3,9 +3,9 @@ main_window.py — Main application window
 
 Layout
 ──────
-  Top bar:  COM port selector  [Refresh]  [Connect / Disconnect]  status indicator
-  Tab bar:  GPIO | Ign/Ilum | UART | I2C Sensors | eMMC | Wi-Fi | Bluetooth |
-            Display | USB Serial Log
+  Top bar:  COM port selector  [Refresh] [Aliases…]  [Connect / Disconnect]  status indicator
+  Tab bar:  Setup | Flash | GPIO | Ign/Ilum | UART | I2C Sensors | CAN | eMMC |
+            Wi-Fi | Bluetooth | Display | USB Serial Log
 
 Wi-Fi and Bluetooth are served by the on-board ESP32-C6; the host talks only to
 the ESP32-P4, which proxies those commands to the C6 over a direct UART link.
@@ -16,33 +16,36 @@ from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QComboBox, QTabWidget, QStatusBar,
 )
-from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 
 from protocol.board_connection import BoardConnection
-from ui.gpio_panel       import GpioPanel
-from ui.ign_ilum_panel   import IgnIlumPanel
-from ui.uart_panel       import UartPanel
-from ui.i2c_panel        import I2cPanel
-from ui.emmc_panel       import EmmcPanel
-from ui.wifi_panel       import WifiPanel
-from ui.bluetooth_panel  import BluetoothPanel
-from ui.display_panel    import DisplayPanel
-from ui.usb_serial_panel import UsbSerialPanel
+from config                    import PortCombo
+from ui.port_alias_dialog      import PortAliasDialog
+from ui.setup_panel            import SetupPanel
+from ui.flash_panel            import FlashPanel
+from ui.gpio_panel             import GpioPanel
+from ui.ign_ilum_panel         import IgnIlumPanel
+from ui.uart_panel             import UartPanel
+from ui.i2c_panel              import I2cPanel
+from ui.can_panel              import CanPanel
+from ui.emmc_panel             import EmmcPanel
+from ui.wifi_panel             import WifiPanel
+from ui.bluetooth_panel        import BluetoothPanel
+from ui.display_panel          import DisplayPanel
+from ui.usb_serial_panel       import UsbSerialPanel
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("ESP32-P4C6 Demo — Board Verification Tool")
-        self.resize(920, 700)
+        self.resize(960, 720)
 
         self._conn = BoardConnection(self)
         self._conn.connected_changed.connect(self._on_connection_changed)
         self._conn.message_received.connect(self._on_message)
 
         self._build_ui()
-        self._refresh_ports()
 
     # ── UI construction ─────────────────────────────────────────────────
 
@@ -65,14 +68,18 @@ class MainWindow(QMainWindow):
         layout.setContentsMargins(0, 0, 0, 0)
 
         layout.addWidget(QLabel("COM port:"))
-        self._port_combo = QComboBox()
-        self._port_combo.setMinimumWidth(160)
+        self._port_combo = PortCombo(slot="main")
         layout.addWidget(self._port_combo)
 
         btn_refresh = QPushButton("Refresh")
         btn_refresh.setFixedWidth(70)
-        btn_refresh.clicked.connect(self._refresh_ports)
+        btn_refresh.clicked.connect(self._port_combo.refresh)
         layout.addWidget(btn_refresh)
+
+        btn_alias = QPushButton("Aliases…")
+        btn_alias.setFixedWidth(80)
+        btn_alias.clicked.connect(self._edit_aliases)
+        layout.addWidget(btn_alias)
 
         layout.addWidget(QLabel("Baud:"))
         self._baud_combo = QComboBox()
@@ -105,10 +112,13 @@ class MainWindow(QMainWindow):
 
     def _build_tabs(self) -> QTabWidget:
         tabs = QTabWidget()
-        tabs.addTab(GpioPanel(self._conn),        "GPIO")
+        tabs.addTab(SetupPanel(),                  "Setup")
+        tabs.addTab(FlashPanel(),                  "Flash")
+        tabs.addTab(GpioPanel(self._conn),         "GPIO")
         tabs.addTab(IgnIlumPanel(self._conn),      "Ign / Ilum")
         tabs.addTab(UartPanel(self._conn),         "UART")
         tabs.addTab(I2cPanel(self._conn),          "I2C Sensors")
+        tabs.addTab(CanPanel(self._conn),          "CAN")
         tabs.addTab(EmmcPanel(self._conn),         "eMMC")
         tabs.addTab(WifiPanel(self._conn),         "Wi-Fi")
         tabs.addTab(BluetoothPanel(self._conn),    "Bluetooth")
@@ -118,21 +128,16 @@ class MainWindow(QMainWindow):
 
     # ── Connection management ───────────────────────────────────────────
 
-    def _refresh_ports(self):
-        ports = BoardConnection.list_ports()
-        current = self._port_combo.currentText()
-        self._port_combo.clear()
-        for p in ports:
-            self._port_combo.addItem(p)
-        idx = self._port_combo.findText(current)
-        if idx >= 0:
-            self._port_combo.setCurrentIndex(idx)
+    def _edit_aliases(self):
+        dlg = PortAliasDialog(self)
+        if dlg.exec():
+            self._port_combo.refresh()
 
     def _toggle_connection(self):
         if self._conn.is_connected:
             self._conn.close()
         else:
-            port = self._port_combo.currentText()
+            port = self._port_combo.current_device()
             baud = self._baud_combo.currentData()
             if not port:
                 self._set_status("No port selected")
@@ -141,11 +146,12 @@ class MainWindow(QMainWindow):
                 self._set_status(f"Failed to open {port}")
 
     def _on_connection_changed(self, connected: bool):
+        port = self._port_combo.current_device()
         if connected:
             self._btn_connect.setText("Disconnect")
             self._status_dot.setStyleSheet("color: #2ecc71;")
-            self._conn_label.setText(f"Connected — {self._port_combo.currentText()}")
-            self._set_status(f"Connected to {self._port_combo.currentText()}")
+            self._conn_label.setText(f"Connected — {port}")
+            self._set_status(f"Connected to {port}")
         else:
             self._btn_connect.setText("Connect")
             self._status_dot.setStyleSheet("color: #e74c3c;")

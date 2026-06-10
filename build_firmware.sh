@@ -35,10 +35,19 @@ done
 # ── Find IDF ─────────────────────────────────────────────────
 
 IDF_PY=""
-for candidate in \
-    "$HOME/.espressif/v5.4.1/esp-idf/tools/idf.py" \
-    "$HOME/esp/esp-idf/tools/idf.py" \
-    "/opt/esp-idf/tools/idf.py"; do
+# Allow caller to override via env var; otherwise probe known locations.
+CANDIDATES=()
+if [ -n "$IDF_PATH" ]; then
+    CANDIDATES+=("$IDF_PATH/tools/idf.py")
+fi
+CANDIDATES+=(
+    "$HOME/.espressif/v5.4.1/esp-idf/tools/idf.py"
+    "$HOME/esp/v5.4/esp-idf/tools/idf.py"
+    "$HOME/esp/v5.4.1/esp-idf/tools/idf.py"
+    "$HOME/esp/esp-idf/tools/idf.py"
+    "/opt/esp-idf/tools/idf.py"
+)
+for candidate in "${CANDIDATES[@]}"; do
     if [ -f "$candidate" ]; then
         IDF_PY="$candidate"
         break
@@ -50,8 +59,16 @@ if [ -z "$IDF_PY" ]; then
     exit 1
 fi
 
-# Source IDF export so the toolchain + python env are on PATH
-. "$(dirname "$IDF_PY")/../export.sh" > /dev/null 2>&1 || true
+# Source IDF export so the toolchain + python env are on PATH.
+# IDF v5.4 doesn't ship a venv for python 3.14 — pin to 3.13 if available.
+if command -v python3.13 >/dev/null 2>&1; then
+    export IDF_PYTHON_ENV_PATH="$HOME/.espressif/python_env/idf5.4_py3.13_env"
+    export ESP_PYTHON="$(command -v python3.13)"
+fi
+# export.sh can return non-zero on benign warnings, so disable -e around it.
+set +e
+. "$(dirname "$IDF_PY")/../export.sh" > /dev/null 2>&1
+set -e
 echo "Using IDF: $(dirname "$(dirname "$IDF_PY")")"
 
 # ── Build / flash one firmware project ───────────────────────

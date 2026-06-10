@@ -1,0 +1,25 @@
+# ── Python ──────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ── ESP-IDF builds ──────────────────────────────────────────────────────
+firmware/build/
+firmware_c6/build/
+firmware/sdkconfig.old
+firmware_c6/sdkconfig.old
+firmware/managed_components/
+firmware_c6/managed_components/
+firmware/dependencies.lock
+firmware_c6/dependencies.lock
+
+# ── Host tool ───────────────────────────────────────────────────────────
+host_tool/.venv/
+
+# ── OS / editor ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

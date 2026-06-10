@@ -17,6 +17,7 @@
 #include "emmc_module.h"
 #include "wifi_module.h"
 #include "display_module.h"
+#include "can_module.h"
 
 static const char *TAG = "proto";
 
@@ -454,6 +455,147 @@ static void handle_display_clear(void)
     proto_send("{\"status\":\"ok\",\"cmd\":\"display_clear\"}");
 }
 
+/* ── CAN handlers ───────────────────────────────────────────────────────── */
+
+static void handle_can_start(cJSON *root)
+{
+    cJSON *jbr = cJSON_GetObjectItem(root, "bitrate");
+    uint32_t bitrate = cJSON_IsNumber(jbr) ? (uint32_t)jbr->valueint : 500000;
+    int rc = can_module_start(bitrate);
+    if (rc == -1) { proto_send_error("can_start", "unsupported bitrate"); return; }
+    if (rc == -2) { proto_send_error("can_start", "driver install failed"); return; }
+    char resp[96];
+    snprintf(resp, sizeof(resp),
+             "{\"status\":\"ok\",\"cmd\":\"can_start\",\"bitrate\":%lu}",
+             (unsigned long)bitrate);
+    proto_send(resp);
+}
+
+static void handle_can_stop(void)
+{
+    can_module_stop();
+    proto_send("{\"status\":\"ok\",\"cmd\":\"can_stop\"}");
+}
+
+static void handle_can_silent(cJSON *root)
+{
+    cJSON *jen = cJSON_GetObjectItem(root, "silent");
+    if (!cJSON_IsBool(jen) && !cJSON_IsNumber(jen)) {
+        proto_send_error("can_silent", "missing silent (bool)");
+        return;
+    }
+    bool silent = cJSON_IsTrue(jen) || (cJSON_IsNumber(jen) && jen->valueint != 0);
+    can_module_set_silent(silent);
+    char resp[80];
+    snprintf(resp, sizeof(resp),
+             "{\"status\":\"ok\",\"cmd\":\"can_silent\",\"silent\":%s}",
+             silent ? "true" : "false");
+    proto_send(resp);
+}
+
+static void handle_can_send(cJSON *root)
+{
+    cJSON *jid = cJSON_GetObjectItem(root, "id");
+    cJSON *jdata = cJSON_GetObjectItem(root, "data_b64");
+    cJSON *jext = cJSON_GetObjectItem(root, "extended");
+    cJSON *jrtr = cJSON_GetObjectItem(root, "rtr");
+    cJSON *jto  = cJSON_GetObjectItem(root, "timeout_ms");
+
+    if (!cJSON_IsNumber(jid)) { proto_send_error("can_send", "missing id"); return; }
+
+    can_frame_t f = {0};
+    f.id       = (uint32_t)jid->valuedouble;
+    f.extended = cJSON_IsTrue(jext);
+    f.rtr      = cJSON_IsTrue(jrtr);
+
+    if (cJSON_IsString(jdata) && jdata->valuestring[0]) {
+        int n = b64_decode(jdata->valuestring, f.data, sizeof(f.data));
+        if (n < 0) { proto_send_error("can_send", "base64 decode failed"); return; }
+        if (n > 8) { proto_send_error("can_send", "data > 8 bytes"); return; }
+        f.dlc = (uint8_t)n;
+    } else {
+        f.dlc = 0;
+    }
+
+    int timeout_ms = cJSON_IsNumber(jto) ? jto->valueint : 100;
+    int rc = can_module_send(&f, timeout_ms);
+    if (rc == -1) { proto_send_error("can_send", "bus not started"); return; }
+    if (rc == -2) { proto_send_error("can_send", "tx queue full / timeout"); return; }
+
+    char resp[160];
+    snprintf(resp, sizeof(resp),
+             "{\"status\":\"ok\",\"cmd\":\"can_send\","
+             "\"id\":%lu,\"dlc\":%u,\"extended\":%s,\"rtr\":%s}",
+             (unsigned long)f.id, f.dlc,
+             f.extended ? "true" : "false", f.rtr ? "true" : "false");
+    proto_send(resp);
+}
+
+static void handle_can_recv(cJSON *root)
+{
+    cJSON *jto = cJSON_GetObjectItem(root, "timeout_ms");
+    int timeout_ms = cJSON_IsNumber(jto) ? jto->valueint : 200;
+
+    can_frame_t f;
+    int rc = can_module_recv(&f, timeout_ms);
+    if (rc < 0) { proto_send_error("can_recv", "bus not started"); return; }
+
+    if (rc == 0) {
+        proto_send("{\"status\":\"ok\",\"cmd\":\"can_recv\",\"received\":false}");
+        return;
+    }
+
+    char b64[24];
+    b64_encode(f.data, f.dlc, b64);
+
+    char resp[PROTO_RESP_MAX];
+    snprintf(resp, sizeof(resp),
+             "{\"status\":\"ok\",\"cmd\":\"can_recv\",\"received\":true,"
+             "\"id\":%lu,\"extended\":%s,\"rtr\":%s,\"dlc\":%u,\"data_b64\":\"%s\"}",
+             (unsigned long)f.id,
+             f.extended ? "true" : "false",
+             f.rtr      ? "true" : "false",
+             f.dlc, b64);
+    proto_send(resp);
+}
+
+static void handle_can_status(void)
+{
+    can_module_status_t s;
+    if (can_module_get_status(&s) != 0) {
+        proto_send_error("can_status", "status read failed");
+        return;
+    }
+    char resp[PROTO_RESP_MAX];
+    snprintf(resp, sizeof(resp),
+             "{\"status\":\"ok\",\"cmd\":\"can_status\","
+             "\"started\":%s,\"silent\":%s,\"bitrate\":%lu,"
+             "\"tx_queued\":%lu,\"rx_queued\":%lu,"
+             "\"tx_errors\":%lu,\"rx_errors\":%lu,"
+             "\"bus_errors\":%lu,\"arb_lost\":%lu,\"bus_off\":%s}",
+             s.started ? "true" : "false",
+             s.silent  ? "true" : "false",
+             (unsigned long)s.bitrate,
+             (unsigned long)s.tx_msgs,    (unsigned long)s.rx_msgs,
+             (unsigned long)s.tx_errors,  (unsigned long)s.rx_errors,
+             (unsigned long)s.bus_errors, (unsigned long)s.arb_lost,
+             s.bus_off ? "true" : "false");
+    proto_send(resp);
+}
+
+static void handle_can_self_test(cJSON *root)
+{
+    cJSON *jbr = cJSON_GetObjectItem(root, "bitrate");
+    uint32_t bitrate = cJSON_IsNumber(jbr) ? (uint32_t)jbr->valueint : 500000;
+    int rc = can_module_self_test(bitrate);
+    char resp[120];
+    snprintf(resp, sizeof(resp),
+             "{\"status\":\"ok\",\"cmd\":\"can_self_test\","
+             "\"bitrate\":%lu,\"loopback_ok\":%s}",
+             (unsigned long)bitrate, (rc == 0) ? "true" : "false");
+    proto_send(resp);
+}
+
 /* ── Main dispatcher ───────────────────────────────────────────────────── */
 
 void proto_dispatch(const char *line, size_t len)
@@ -491,6 +633,13 @@ void proto_dispatch(const char *line, size_t len)
     else if (strcmp(cmd, "display_pattern")  == 0) handle_display_pattern();
     else if (strcmp(cmd, "display_text")     == 0) handle_display_text(root);
     else if (strcmp(cmd, "display_clear")    == 0) handle_display_clear();
+    else if (strcmp(cmd, "can_start")        == 0) handle_can_start(root);
+    else if (strcmp(cmd, "can_stop")         == 0) handle_can_stop();
+    else if (strcmp(cmd, "can_silent")       == 0) handle_can_silent(root);
+    else if (strcmp(cmd, "can_send")         == 0) handle_can_send(root);
+    else if (strcmp(cmd, "can_recv")         == 0) handle_can_recv(root);
+    else if (strcmp(cmd, "can_status")       == 0) handle_can_status();
+    else if (strcmp(cmd, "can_self_test")    == 0) handle_can_self_test(root);
     else {
         char msg[64];
         snprintf(msg, sizeof(msg), "unknown command: %s", cmd);
