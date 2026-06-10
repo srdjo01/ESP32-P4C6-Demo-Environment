@@ -195,6 +195,74 @@ first call may take a moment and will fail cleanly if no panel is attached.
 
 ---
 
+## CAN (TJA1051 transceiver)
+
+CAN bus support via TWAI. Wiring on the ESP32-P4 side:
+**GPIO1 → TXD, GPIO2 ← RXD, GPIO3 → S/STB, GND ↔ GND**.
+See [`modules/can.md`](modules/can.md) for the full wiring and rationale.
+
+The bus must be **started** before sending or receiving. Frame data is
+Base64-encoded the same way as `uart_send`/`uart_recv`. Max payload is 8 bytes.
+
+### `can_start` — install the TWAI driver and start the bus
+`bitrate` defaults to 500000. Supported: 25000, 50000, 100000, 125000, 250000,
+500000, 800000, 1000000.
+```json
+→ {"cmd":"can_start","bitrate":500000}
+← {"status":"ok","cmd":"can_start","bitrate":500000}
+```
+
+### `can_stop` — stop the bus and uninstall the driver
+```json
+→ {"cmd":"can_stop"}
+← {"status":"ok","cmd":"can_stop"}
+```
+Use this to recover from a `bus_off` state, then `can_start` again.
+
+### `can_silent` — toggle the TJA1051's STB pin
+```json
+→ {"cmd":"can_silent","silent":true}
+← {"status":"ok","cmd":"can_silent","silent":true}
+```
+`true` = silent mode (RX only); `false` = normal mode.
+
+### `can_send` — transmit a frame
+```json
+→ {"cmd":"can_send","id":291,"extended":false,"rtr":false,
+   "data_b64":"ESIzRA==","timeout_ms":100}
+← {"status":"ok","cmd":"can_send","id":291,"dlc":4,"extended":false,"rtr":false}
+```
+For RTR frames the payload is ignored; the receiver gets a remote-frame request
+with the requested DLC.
+
+### `can_recv` — receive one frame (poll)
+`timeout_ms` defaults to 200. If no frame arrives, `received` is `false` and the
+data fields are omitted.
+```json
+→ {"cmd":"can_recv","timeout_ms":200}
+← {"status":"ok","cmd":"can_recv","received":true,
+   "id":291,"extended":false,"rtr":false,"dlc":4,"data_b64":"ESIzRA=="}
+```
+
+### `can_status` — read driver / bus counters
+```json
+→ {"cmd":"can_status"}
+← {"status":"ok","cmd":"can_status",
+   "started":true,"silent":false,"bitrate":500000,
+   "tx_queued":0,"rx_queued":0,
+   "tx_errors":0,"rx_errors":0,"bus_errors":0,"arb_lost":0,"bus_off":false}
+```
+
+### `can_self_test` — internal-loopback verification
+Runs the TWAI controller in `NO_ACK` self-loopback. **Needs no transceiver and
+no wiring** — verifies the controller and GPIO matrix paths in isolation.
+```json
+→ {"cmd":"can_self_test","bitrate":500000}
+← {"status":"ok","cmd":"can_self_test","bitrate":500000,"loopback_ok":true}
+```
+
+---
+
 ## Notes for tool authors
 
 - **One command at a time.** The board processes commands serially; wait for a

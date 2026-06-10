@@ -25,7 +25,27 @@ these on your PC.
 
 ---
 
-## Option A — build scripts (recommended)
+## Option A — from the GUI (no shell needed)
+
+1. Launch the GUI (`run_gui.sh` / `run_gui.ps1`).
+2. Open the **Setup** tab. The first time, click **Auto-detect** — it finds
+   ESP-IDF, the bootstrap Python interpreter, and the IDF Python venv. Use
+   **Browse…** if any path is wrong; settings are saved automatically. Click
+   **Test** to confirm `idf.py --version` runs cleanly.
+3. Open the **Flash** tab. Pick **Target** (P4 / C6 / both), select the flash
+   ports, tick **Flash after build** (and optionally **Monitor after flash**),
+   then click **Build && Flash**. Live build output streams into the console.
+
+The GUI sources `export.sh` / `export.bat` internally, so the toolchain
+(riscv-elf-gcc, esptool, IDF Python helpers) all resolve without a setup shell.
+The same auto-detect logic lives in the build script for headless use.
+
+> Don't recognise a port? Click **Aliases…** to give each device a friendly
+> name — the picker then shows `MyName — /dev/cu.usbmodem...` everywhere.
+
+---
+
+## Option B — build scripts (headless / CI)
 
 ### Flash both chips at once
 **Windows**
@@ -57,7 +77,7 @@ after flashing.
 
 ---
 
-## Option B — manual `idf.py`
+## Option C — manual `idf.py`
 
 First make the IDF environment available in your shell:
 ```bash
@@ -89,7 +109,7 @@ and happens once.
 
 ---
 
-## Option C — external USB-UART adapter (boards that won't enter download mode)
+## Option D — external USB-UART adapter (boards that won't enter download mode)
 
 Some board variants have eFuse quirks that block the built-in download path. Use a
 CP2102/CH340 adapter on the P4's UART0:

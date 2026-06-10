@@ -144,6 +144,58 @@ and retry.
 Some boards have eFuse quirks. Flash over an external USB-UART adapter in manual
 bootloader mode — see [`flashing_guide.md`](flashing_guide.md) "External adapter".
 
+### `idf.py` fails with `No module named 'click'`
+You're running `idf.py` with the wrong Python. ESP-IDF v5.4 keeps `idf.py`'s CLI
+deps (click, pyserial, …) in a venv at `~/.espressif/python_env/idf5.4_pyX.Y_env/`,
+not in the system / Homebrew Python. Two fixes:
+
+- **From the GUI:** open the **Setup** tab and confirm the **IDF Python venv**
+  field points at that directory. Click **Test** — it should report a version
+  string, not the click error.
+- **From the shell:** source `export.sh` first
+  (`. ~/esp/v5.4/esp-idf/export.sh`), or run
+  `~/.espressif/python_env/idf5.4_py3.13_env/bin/python ~/esp/v5.4/esp-idf/tools/idf.py …`
+  directly.
+
+The `build_firmware.sh` script handles this for you, including pinning Python
+3.13 on systems where the default `python3` is a newer version IDF doesn't yet
+ship a venv for.
+
+---
+
+## CAN
+
+### `Self-test (loopback)` reports FAIL
+The TWAI controller couldn't loop a frame back to itself. This is a controller
+or build problem, not a wiring problem (the self-test runs in `NO_ACK` self-mode
+and needs no external hardware).
+
+- Re-flash the firmware and try again — the controller can be left in a weird
+  state by an aborted previous run.
+- Verify GPIO 1/2/3 aren't claimed by another component on a fork of the firmware.
+
+### Frames sent but never received on the other side
+Walk through these in order:
+
+1. **Same bitrate on both ends?** This is the most common cause.
+2. **120 Ω termination at each end of the bus?** Without it, error counters
+   climb fast and the controller will trip into bus-off.
+3. **Common GND between the two nodes?** A floating ground silently breaks the
+   bus.
+4. **Silent mode off?** Click the **Silent mode (STB high)** checkbox to clear it.
+   Silent mode keeps the receiver active but the transceiver won't drive the bus.
+5. **CAN_H / CAN_L not swapped?** The TJA1051 doesn't tolerate inversion.
+
+### Status shows `bus_off=true`
+The controller has shut down its transmitter after exceeding 256 TX errors —
+usually missing termination, no other node ack'ing, or the wrong bitrate. To
+recover: **Stop**, fix the underlying wiring/bitrate issue, then **Start** again.
+
+### `tx_errors` and `arb_lost` keep climbing
+On a busy bus `arb_lost` is normal — your node lost arbitration to a
+higher-priority frame. `tx_errors` climbing while idle indicates a wiring
+problem (open bus, missing ground, mis-terminated bus).
+
 ---
 
 ## When all else fails

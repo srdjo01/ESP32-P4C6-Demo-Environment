@@ -40,6 +40,9 @@ the reasoning behind this design.
 ## Quick start
 
 > First time? Use the setup script — it installs ESP-IDF and the GUI dependencies for you.
+> You can also point the GUI at an existing ESP-IDF install via the **Setup** tab and
+> build / flash from the **Flash** tab — no shell scripts required after the initial
+> install. See [`testing_guide.md`](docs/testing_guide.md#setup-tab--configure-esp-idf-and-python-paths).
 
 ### Windows (PowerShell)
 
@@ -70,7 +73,7 @@ the reasoning behind this design.
 ESP32-P4C6 Demo Environment/
 ├── firmware/                 ESP-IDF project for the ESP32-P4  (target: esp32p4)
 │   ├── main/                 app_main.c, protocol.c (JSON dispatcher)
-│   ├── components/           gpio, uart, i2c, emmc, wifi, display modules
+│   ├── components/           gpio, uart, i2c, emmc, wifi, display, can modules
 │   ├── managed_components/   esp_tinyusb, esp_lcd_co5300, lvgl, ...
 │   ├── partitions.csv        4 MB flash, 3 MB app partition
 │   └── sdkconfig.defaults    chip + PSRAM + TinyUSB CDC config
@@ -79,7 +82,8 @@ ESP32-P4C6 Demo Environment/
 │   └── sdkconfig.defaults    Wi-Fi + NimBLE + coexistence config
 ├── host_tool/                PyQt6 GUI verification tool
 │   ├── main.py               entry point
-│   ├── ui/                   one panel per peripheral tab
+│   ├── ui/                   one panel per peripheral tab (Setup, Flash, GPIO, ...)
+│   ├── config/               persistent settings (port aliases, tool paths)
 │   ├── protocol/             board_connection.py (serial + JSON framing), commands.py
 │   └── requirements.txt      PyQt6, pyserial
 ├── docs/                     ← all documentation (start with getting_started.md)
@@ -120,6 +124,7 @@ Every message is a single JSON object terminated by `\n`, spoken over the P4's U
 {"cmd":"ping"}
 {"cmd":"gpio_set","pin":16,"level":1}
 {"cmd":"i2c_read","sensor":"accel"}
+{"cmd":"can_start","bitrate":500000}
 {"cmd":"wifi_scan"}
 {"cmd":"ble_scan"}
 ```
@@ -144,7 +149,7 @@ The full command list with every parameter is in [`docs/protocol.md`](docs/proto
 | [`docs/testing_guide.md`](docs/testing_guide.md) | Tab-by-tab GUI test procedures and the wiring each one needs. |
 | [`docs/protocol.md`](docs/protocol.md) | Complete JSON command/response reference. |
 | [`docs/troubleshooting.md`](docs/troubleshooting.md) | Every gotcha we hit, with the fix. Read this when something misbehaves. |
-| `docs/modules/*.md` | Deep-dive per peripheral (GPIO, UART, I²C, eMMC, display, Wi-Fi/BLE). |
+| `docs/modules/*.md` | Deep-dive per peripheral (GPIO, UART, I²C, eMMC, display, Wi-Fi/BLE, CAN). |
 
 ---
 
@@ -169,6 +174,7 @@ The full command list with every parameter is in [`docs/protocol.md`](docs/proto
 | Ignition / Illumination inputs | ✅ Working |
 | UART CN3 / CN4 | ✅ Working |
 | I²C accelerometer (QMI8658A) + RTC (PCF85063) | ✅ Working |
+| CAN bus (TJA1051 on GPIO 1/2/3) | ✅ Working — controller verified via internal loopback; needs an external transceiver for a real bus |
 | Wi-Fi scan / connect / ping (via C6) | ✅ Working |
 | Bluetooth LE scan (via C6) | ✅ Working |
 | eMMC read/write/verify | ⚠️ Hardware-dependent (LDO ch4 / board variant) |

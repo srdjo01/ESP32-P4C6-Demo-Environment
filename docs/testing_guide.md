@@ -25,6 +25,53 @@ or run the packaged app from `dist/` (built with `build_gui`).
 > One connection is all you need. Wi-Fi and Bluetooth are served by the C6 *through*
 > the P4 — there is no separate "C6 port" to connect.
 
+> **Don't recognise a port?** Click **Aliases…** next to the port picker. Type a
+> friendly name for each device (e.g. *"P4 CDC"*, *"C6 CH340"*) and the picker
+> will show `MyName — /dev/cu.usbmodem...` everywhere a port is selectable. The
+> aliases are saved per-device under `~/.esp32_p4c6_tool/config.json` (macOS/Linux)
+> or `%APPDATA%/ESP32-P4C6-Tool/config.json` (Windows) and follow you across
+> sessions and machines if you copy that file.
+
+---
+
+## Setup tab — configure ESP-IDF and Python paths
+
+Used by the **Flash** tab to know where ESP-IDF lives. You only need to touch this
+tab once after installing the toolchain.
+
+1. Open **Setup**. The first time, it auto-detects ESP-IDF, the Python interpreter,
+   and the IDF Python venv and saves them automatically.
+2. If anything is missing or wrong, **Browse…** lets you point at any directory or
+   interpreter manually. Saved on every edit.
+3. Click **Test** → runs `idf.py --version` with the configured paths and reports
+   the version, or the exact error if something's mis-wired.
+
+The **IDF Python venv** field matters: `idf.py` and its CLI dependencies (click,
+pyserial, …) live inside that venv, *not* in the bootstrap Python interpreter
+field above it. Leaving the venv blank usually means the build will fail with
+*"No module named 'click'"*.
+
+---
+
+## Flash tab — build and flash from the GUI
+
+No more shell scripts needed. The Flash tab calls the same `idf.py` your terminal
+would, with the IDF environment loaded from `export.sh` / `export.bat`.
+
+1. Pick a **Target** (P4 only / C6 only / Both).
+2. **Firmware** paths default to the auto-detected `firmware/` and `firmware_c6/`
+   directories of this repo. Override via Browse if you're flashing a fork or a
+   project living elsewhere.
+3. **Ports**: pick the P4 flash port (USB-Serial/JTAG) and/or the C6 CH340 port.
+   Aliases set on the connection bar show up here too.
+4. Tick **Flash after build** for build+flash; **Monitor after flash** to leave a
+   serial monitor open.
+5. **Build && Flash** runs the queued jobs sequentially; stop anytime with **Stop**.
+
+Live build output streams into the console below — same lines you'd get from
+`./build_firmware.sh`. After flashing, **power-cycle the board** (unplug/replug)
+so both chips boot cleanly.
+
 ---
 
 ## GPIO (pins 16–19)
@@ -132,15 +179,65 @@ before attaching the panel. If no panel is attached, the command returns an erro
 
 ---
 
+## CAN (TJA1051 transceiver)
+
+The CAN tab drives the ESP32-P4's TWAI controller through an external **TJA1051**
+transceiver. See [`modules/can.md`](modules/can.md) for the full wiring; the short
+version:
+
+```
+ESP32-P4 GPIO1  ──► TJA1051 TXD
+ESP32-P4 GPIO2  ◄── TJA1051 RXD
+ESP32-P4 GPIO3  ──► TJA1051 S/STB
+ESP32-P4 GND    ─── TJA1051 GND
+```
+
+CAN_H / CAN_L go to your bus, with **120 Ω termination at each end**.
+
+### Step 1 — controller-only self-test (no transceiver, no wiring)
+
+Verifies the TWAI peripheral and the GPIO matrix without any external hardware.
+
+1. Open **CAN**.
+2. Pick a bitrate (default **500 kbit/s**).
+3. Click **Self-test (loopback)**.
+4. Expect `[self-test] PASS (controller loopback @ 500000)` in the log.
+
+If this fails, the firmware build or the chip itself is wrong — fix this before
+soldering anything.
+
+### Step 2 — bring up the bus
+
+1. Click **Start** at your bus's bitrate. The status line shows `started=True`.
+2. (Optional) Tick **Silent mode (STB high)** to put the transceiver into RX-only
+   mode. Useful for sniffing without disturbing the bus.
+
+### Step 3 — send and receive a frame
+
+1. Tick **Auto-poll** (default 100 ms) so received frames stream into the log.
+2. In **Send frame**, fill in:
+   - **ID:** hex (`0x123` or `123`).
+   - **Data:** hex bytes, max 8 (`11 22 33 44`, `0xAA,0xBB`, …).
+   - **Extended (29-bit)** for extended IDs; **RTR** for remote-frame requests.
+3. Click **Send**. Confirmation appears as `[TX] 0x123  dlc=4  11 22 33 44`.
+4. Frames arriving from the other side appear as `[RX] ...` in the same log.
+
+### Step 4 — read counters
+
+Click **Refresh status** to read `tx_errors`, `rx_errors`, `bus_errors`,
+`arb_lost`, and the `bus_off` flag. If `bus_off` is `true`, the controller has
+stopped transmitting — click **Stop** then **Start** to recover (the underlying
+problem is usually missing termination or the wrong bitrate).
+
+### Two-board test rig
+
+Two boards (or one board + a USB-CAN adapter) on the same bitrate, sharing
+GND, with 120 Ω at each end. Send on one side, watch the other's RX log fill up.
+
+---
+
 ## USB Serial Log
 
 Shows the raw line traffic to/from the board in real time. Leave it open while
 testing other tabs to see exactly what was sent and received — invaluable when a
 command returns an unexpected error.
-
----
-
-## Not yet covered
-
-- **CAN / TWAI** — excluded from this release (needs a transceiver and second node;
-  wiring will be added when cabling is available).

@@ -88,7 +88,9 @@ Write down the three port names — you need them in the next step.
 ## Step 3 — Flash both chips
 
 The P4 firmware (`firmware/`) and C6 firmware (`firmware_c6/`) are flashed over
-**different** ports. One command flashes both.
+**different** ports. You can do this from the GUI's **Flash** tab (recommended
+for first-timers — see [Step 5](#step-5--run-the-gui)) or from the shell with
+the build scripts below.
 
 ### Windows
 ```powershell
@@ -174,6 +176,8 @@ Then launch `dist\ESP32-P4C6-Tool.exe` (or the `.app`).
    click **Read** to confirm.
 5. Open the **Wi-Fi** tab → **Scan for networks** → nearby SSIDs appear.
 6. Open the **Bluetooth** tab → **Scan for BLE devices** → nearby devices appear.
+7. (Optional) Open the **CAN** tab → click **Self-test (loopback)** → expect
+   `[self-test] PASS`. Verifies the TWAI controller without any external wiring.
 
 That's it — you're up and running. For what each tab does and the wiring some tests
 need, see [`testing_guide.md`](testing_guide.md).
